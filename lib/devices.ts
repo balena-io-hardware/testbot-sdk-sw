@@ -116,16 +116,20 @@ export class IntelNuc extends DeviceInteractor {
 		await this.testBot.switchSdToDUT(1000);
 		await this.testBot.powerOnDUT();
 
+		await Bluebird.delay(5000); // Wait 5s before measuring current for the first time, or we may power off again during flashing!
 		let current = await this.testBot.readVoutAmperage();
-		while (current > 0.05) {
-			await Bluebird.delay(10000); // Wait 10s before measuring current again.
+		console.log('Initial current measurement:' + current);
+		while (current > 0.1) {
+			await Bluebird.delay(5000); // Wait 5s before measuring current again.
 			current = await this.testBot.readVoutAmperage();
+			console.log(current);
 		}
-
+		console.log('Internally flashed - powering off DUT');
 		// Once current has dropped below the threshold, power off and toggle mux.
 		await this.testBot.powerOffDUT();
 		await this.testBot.switchSdToHost(1000);
 		// Turn power back on, this should now get the NUC to boot from internal mmc as USB is no longer connected.
 		await this.testBot.powerOnDUT();
+		console.log('Powering on DUT - should now boot from internal storage');
 	}
 }
