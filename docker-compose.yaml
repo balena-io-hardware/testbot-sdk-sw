@@ -1,0 +1,21 @@
+version: '2.1'
+
+volumes:
+  os-images:
+
+services:
+  # End-to-end test for testbot HAT.
+  test-scenario:
+    build: .
+    privileged: true
+    restart: no
+    volumes:
+      - os-images:/images
+  # REPL for testbot HAT.
+  # repl:
+  #   build: .
+  #   privileged: true
+  #   restart: always
+  #   command: ["/usr/src/app/test/entry.sh", "repl-service"]
+  #   volumes:
+  #     - os-images:/images

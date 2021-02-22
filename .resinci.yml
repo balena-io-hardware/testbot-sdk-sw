@@ -1,0 +1,12 @@
+---
+docker:
+  run: false
+npm:
+  run: true
+  platforms:
+    - name: linux
+      os: alpine
+      architecture: x86_64
+      node_versions:
+        - 12
+        - 10
