@@ -113,7 +113,7 @@ export class IntelNuc extends DeviceInteractor {
 
 	async powerOn() {
 		await this.testBot.setVout(this.powerVoltage);
-		await this.testBot.switchSdToDUT(1000);
+		await this.testBot.switchSdToDUT(5000); //Wait for 5s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		await this.testBot.powerOnDUT();
 
 		await Bluebird.delay(5000); // Wait 5s before measuring current for the first time, or we may power off again during flashing!
