@@ -118,11 +118,13 @@ export class IntelNuc extends DeviceInteractor {
 
 		await Bluebird.delay(5000); // Wait 5s before measuring current for the first time, or we may power off again during flashing!
 		let current = await this.testBot.readVoutAmperage();
-		console.log('Initial current measurement:' + current + " Amps");
+		console.log('Initial current measurement:' + current + ' Amps');
 		while (current > 0.1) {
 			await Bluebird.delay(5000); // Wait 5s before measuring current again.
 			current = await this.testBot.readVoutAmperage();
-			console.log('Awaiting DUT to flash and power down, current: ' + current + " Amps");
+			console.log(
+				'Awaiting DUT to flash and power down, current: ' + current + ' Amps',
+			);
 		}
 		console.log('Internally flashed - powering off DUT');
 		// Once current has dropped below the threshold, power off and toggle mux.
