@@ -66,6 +66,6 @@ describe('Testbot', () => {
 			// We use a magic number, not extremely small to check we actually get the logs.
 			expect(collectedLogs.length).toBeGreaterThan(5);
 		},
-		60 * 1000, // 60 seconds.
+		60 * 5 * 1000, // 300 seconds.
 	);
 });
