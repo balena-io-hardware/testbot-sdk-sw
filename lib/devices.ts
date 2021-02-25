@@ -118,20 +118,32 @@ export class IntelNuc extends DeviceInteractor {
 
 		await Bluebird.delay(5000); // Wait 5s before measuring current for the first time, or we may power off again during flashing!
 		let current = await this.testBot.readVoutAmperage();
+		let timedOut = 0;
 		console.log('Initial current measurement:' + current + ' Amps');
-		while (current > 0.1) {
+
+		const timeoutHandle = global.setTimeout(() => {
+			timedOut = 1;
+		}, 360000); // 6 minute timeout
+
+		while (current > 0.1 && timedOut === 0) {
 			await Bluebird.delay(5000); // Wait 5s before measuring current again.
 			current = await this.testBot.readVoutAmperage();
 			console.log(
 				'Awaiting DUT to flash and power down, current: ' + current + ' Amps',
 			);
 		}
-		console.log('Internally flashed - powering off DUT');
-		// Once current has dropped below the threshold, power off and toggle mux.
-		await this.testBot.powerOffDUT();
-		await this.testBot.switchSdToHost(1000);
-		// Turn power back on, this should now get the NUC to boot from internal mmc as USB is no longer connected.
-		await this.testBot.powerOnDUT();
-		console.log('Powering on DUT - should now boot from internal storage');
+
+		clearTimeout(timeoutHandle);
+		if (timedOut === 1) {
+			throw new Error('Timed out while waiting for DUT to flash');
+		} else {
+			console.log('Internally flashed - powering off DUT');
+			// Once current has dropped below the threshold, power off and toggle mux.
+			await this.testBot.powerOffDUT();
+			await this.testBot.switchSdToHost(1000);
+			// Turn power back on, this should now get the NUC to boot from internal mmc as USB is no longer connected.
+			await this.testBot.powerOnDUT();
+			console.log('Powering on DUT - should now boot from internal storage');
+		}
 	}
 }
