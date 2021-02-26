@@ -112,6 +112,7 @@ export class IntelNuc extends DeviceInteractor {
 	}
 
 	async powerOn() {
+		await this.testBot.powerOffDUT();
 		await this.testBot.setVout(this.powerVoltage);
 		await this.testBot.switchSdToDUT(5000); // Wait for 5s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		await this.testBot.powerOnDUT();
@@ -121,7 +122,7 @@ export class IntelNuc extends DeviceInteractor {
 		let timedOut = 0;
 		console.log('Initial current measurement:' + current + ' Amps');
 
-		const timeoutHandle = global.setTimeout(() => {
+		const timeoutHandle = setTimeout(() => {
 			timedOut = 1;
 		}, 360000); // 6 minute timeout
 
