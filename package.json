@@ -1,6 +1,6 @@
 {
   "name": "@balena/testbot",
-  "version": "1.7.11",
+  "version": "1.7.12",
   "description": "Testbot SDK",
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
