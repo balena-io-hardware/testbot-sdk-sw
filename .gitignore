@@ -1,6 +1,7 @@
 # NPM/build related.
 node_modules
 build
+bin
 docs
 
 # Created by https://www.gitignore.io/api/osx,linux,macos,windows
@@ -85,5 +86,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Balena
+.balena
 
 # End of https://www.gitignore.io/api/osx,linux,macos,windows

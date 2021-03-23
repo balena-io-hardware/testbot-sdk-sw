@@ -3,6 +3,10 @@ import { fs } from 'mz';
 import * as Stream from 'stream';
 import * as zlib from 'zlib';
 import { TestBot } from './base';
+import * as sdk from 'etcher-sdk';
+import { exec } from 'child_process';
+import * as path from 'path';
+const execP = Bluebird.promisify(exec);
 
 /**
  * `DeviceInteractor` class can be used as a base class for interaction with a
@@ -101,6 +105,125 @@ export class RaspberryPi extends DeviceInteractor {
 	async powerOn() {
 		await this.testBot.setVout(this.powerVoltage);
 		await this.testBot.switchSdToDUT(1000);
+		await this.testBot.powerOnDUT();
+	}
+}
+
+/** Implementation for balenaFin v1.1.x (V10+)
+ * @remark
+ * For the balenaFin `v1.0.0`, see the [[BalenaFinV09]] child class.
+ */
+export class BalenaFin extends DeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 12);
+	}
+
+	readonly OUTPUT_DIR = path.join(__dirname, '..', 'bin', '/');
+
+	// usb-toggle
+	async toggleUsb(state: boolean, port: number) {
+		console.log(`Toggling USB ${state ? 'on' : 'off'}`);
+		await execP(
+			`${this.OUTPUT_DIR}uhubctl -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
+		);
+	}
+
+	protected async powerOnFlash() {
+		await this.toggleUsb(false, 4);
+		await Bluebird.delay(1000); // Wait 1s before trying to turning USB back on
+		await this.toggleUsb(true, 4);
+	}
+
+	async flash(stream: Stream.Readable) {
+		console.log('Entering flash method for Fin');
+
+		await this.powerOnFlash();
+		// etcher-sdk (power on) usboot
+		const adapters: sdk.scanner.adapters.Adapter[] = [
+			new sdk.scanner.adapters.BlockDeviceAdapter(() => false),
+			new sdk.scanner.adapters.UsbbootDeviceAdapter(),
+		];
+		const deviceScanner = new sdk.scanner.Scanner(adapters);
+		console.log('Waiting for compute module');
+		// Wait for compute module to appear over usb
+		const computeModule: sdk.sourceDestination.UsbbootDrive = await new Promise(
+			(resolve, reject) => {
+				function onAttach(
+					drive: sdk.scanner.adapters.AdapterSourceDestination,
+				) {
+					if (drive instanceof sdk.sourceDestination.UsbbootDrive) {
+						deviceScanner.removeListener('attach', onAttach);
+						resolve(drive);
+					}
+				}
+				deviceScanner.on('attach', onAttach);
+				deviceScanner.on('error', reject);
+				deviceScanner.start();
+			},
+		);
+		console.log('Compute module attached');
+		// wait to convert to block device.
+		await new Promise<void>((resolve, reject) => {
+			function onDetach(drive: sdk.scanner.adapters.AdapterSourceDestination) {
+				if (drive === computeModule) {
+					deviceScanner.removeListener('detach', onDetach);
+					resolve();
+				}
+			}
+			deviceScanner.on('detach', onDetach);
+			deviceScanner.on('error', reject);
+		});
+
+		console.log('Waiting for compute module to reattach as a block device');
+
+		const dest = await new Promise(
+			(resolve: (drive: sdk.sourceDestination.BlockDevice) => void, reject) => {
+				function onAttach(
+					drive: sdk.scanner.adapters.AdapterSourceDestination,
+				) {
+					if (
+						drive instanceof sdk.sourceDestination.BlockDevice &&
+						drive.description === 'Compute Module'
+					) {
+						console.log('Attached compute module.');
+						resolve(drive);
+						deviceScanner.removeListener('attach', onAttach);
+					}
+				}
+				deviceScanner.on('attach', onAttach);
+				deviceScanner.on('error', reject);
+			},
+		);
+		deviceScanner.stop();
+
+		await Bluebird.delay(1000); // Wait 1s before trying to flash
+		console.log('Flashing started...');
+		await this.testBot.flashToDisk(dest, stream);
+		console.log('Flashed!');
+		await this.toggleUsb(false, 4);
+		await this.testBot.powerOffDUT();
+	}
+
+	async powerOn() {
+		console.log('Powering on Fin');
+		await this.toggleUsb(false, 4);
+		await Bluebird.delay(1000);
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.powerOnDUT();
+	}
+}
+
+/** Implementation for balenaFin v1.0.0
+ * @remark
+ * The balenaFin `v1.0.0` (V09) has a slightly different USB boot power sequence that may
+ * damage later versions (V10+) of the balenaFin.
+ */
+export class BalenaFinV09 extends BalenaFin {
+	protected async powerOnFlash() {
+		await this.toggleUsb(false, 4);
+		await Bluebird.delay(1000); // Wait 1s before trying to turning USB back on
+		await this.toggleUsb(true, 4);
+		await this.testBot.setVout(this.powerVoltage);
 		await this.testBot.powerOnDUT();
 	}
 }

@@ -1,6 +1,12 @@
 import { https } from 'follow-redirects';
 import * as fs from 'fs';
-import { IntelNuc, RaspberryPi, TestBotHat } from '../lib';
+import {
+	IntelNuc,
+	RaspberryPi,
+	BalenaFin,
+	BalenaFinV09,
+	TestBotHat,
+} from '../lib';
 import { getSdk } from 'balena-sdk';
 
 // Dockerfile defines a volume at this path.
@@ -12,16 +18,26 @@ export async function resolveDutOsImage(dutType: string) {
 }
 
 const resolveImageInfo = async (dutType: string) => {
-	if (dutType === 'intel-nuc') {
-		return {
-			deviceType: 'intel-nuc',
-			version: await resolveDutOsVersion(),
-		};
+	switch (dutType) {
+		case 'fincm3': {
+			return {
+				deviceType: 'fincm3',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'intel-nuc': {
+			return {
+				deviceType: 'intel-nuc',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		default: {
+			return {
+				deviceType: dutType,
+				version: await resolveDutOsVersion(),
+			};
+		}
 	}
-	return {
-		deviceType: dutType,
-		version: await resolveDutOsVersion(),
-	};
 };
 
 export const downloadOsImage = async (
@@ -88,8 +104,19 @@ export function resolveDutType() {
 
 export function createDeviceInteractor(testbotHat: TestBotHat) {
 	const dutType = resolveDutType();
-	if (dutType === 'intel-nuc') {
-		return new IntelNuc(testbotHat);
+	switch (dutType) {
+		case 'fincm3': {
+			// check environment variable to see if using balenaFin v1.0.0 (V09)
+			if (process.env.BALENA_FIN_V09 === 'true') {
+				return new BalenaFinV09(testbotHat);
+			}
+			return new BalenaFin(testbotHat);
+		}
+		case 'intel-nuc': {
+			return new IntelNuc(testbotHat);
+		}
+		default: {
+			return new RaspberryPi(testbotHat);
+		}
 	}
-	return new RaspberryPi(testbotHat);
 }

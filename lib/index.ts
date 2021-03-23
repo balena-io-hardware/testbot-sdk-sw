@@ -1,4 +1,17 @@
 import { TestBotHat } from './hat';
-import { DeviceInteractor, RaspberryPi, IntelNuc } from './devices';
+import {
+	DeviceInteractor,
+	RaspberryPi,
+	IntelNuc,
+	BalenaFin,
+	BalenaFinV09,
+} from './devices';
 
-export { TestBotHat, DeviceInteractor, RaspberryPi, IntelNuc };
+export {
+	TestBotHat,
+	DeviceInteractor,
+	RaspberryPi,
+	IntelNuc,
+	BalenaFin,
+	BalenaFinV09,
+};
