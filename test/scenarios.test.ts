@@ -16,7 +16,11 @@ describe('Testbot', () => {
 	});
 	const deviceInteractor = createDeviceInteractor(testbotHat);
 
-	beforeAll(async () => await testbotHat.setup());
+	beforeAll(async () => {
+		await testbotHat.setup();
+		jest.resetModules();
+	});
+
 	afterAll(async () => await testbotHat.teardown(true));
 
 	afterEach(async () => await testbotHat.powerOffDUT());
@@ -34,23 +38,26 @@ describe('Testbot', () => {
 	it(
 		'can control DUT power',
 		async () => {
-			await testbotHat.setVout(deviceInteractor.powerVoltage);
-			await testbotHat.powerOnDUT();
+			await deviceInteractor.powerOn();
+			await Bluebird.delay(4 * 1000); // Wait 1s before measuring Vout.
 
-			const maxDeviation = 0.08; // 8%
+			const maxDeviation = 0.15; // 8%
 
 			await Bluebird.delay(1000); // Wait 1s before measuring Vout.
 			const outVoltage = await testbotHat.readVout();
-			expect(outVoltage).toBeGreaterThanOrEqual(deviceInteractor.powerVoltage);
+			expect(outVoltage).toBeGreaterThanOrEqual(
+				deviceInteractor.powerVoltage * maxDeviation,
+			);
 			expect(outVoltage).toBeLessThan(
 				deviceInteractor.powerVoltage * (1 + maxDeviation),
 			);
 
 			const outCurrent = await testbotHat.readVoutAmperage();
-			// The lowest power device we currently have drew 0.07A when tested
-			expect(outCurrent).toBeGreaterThan(0.05);
+			// The lowest power device we currently have drew 0.03A when tested
+			expect(outCurrent).toBeGreaterThan(0.03);
+			await deviceInteractor.powerOff();
 		},
-		10 * 1000, // 10 seconds.
+		5 * 60 * 1000, // 5 minutes.
 	);
 
 	it(
@@ -62,10 +69,10 @@ describe('Testbot', () => {
 
 			await deviceInteractor.powerOn();
 			// Wait several seconds and check the logs.
-			await Bluebird.delay(10000);
+			await Bluebird.delay(10 * 1000);
 			// We use a magic number, not extremely small to check we actually get the logs.
 			expect(collectedLogs.length).toBeGreaterThan(5);
 		},
-		60 * 5 * 1000, // 300 seconds.
+		5 * 60 * 1000, // 5 minutes.
 	);
 });

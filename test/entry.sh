@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-
+echo "starting..." 
 if [ "$1" == "dev" ]; then
-  # This command is run in livepush mode to watch source file changes and re-run the tests.
-  exec ./node_modules/.bin/jest -i --watchAll
+  # This command is run in livepush mode to watch source file changes and re-run the tests
+  exec ./node_modules/.bin/jest -i --watchAll --no-cache
 elif [ "$1" == 'test' ]; then
   # Execute the test scenarios, we assume the working directory is the project root.
   # Jest is forced to run tests sequentially with -i option.
-  exec ./node_modules/.bin/jest -i --testTimeout=700000
+  exec ./node_modules/.bin/jest -i --testTimeout=700000 --no-cache
 elif [ "$1" == 'repl-service' ]; then
   echo "Start REPL service"
   echo

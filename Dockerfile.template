@@ -4,6 +4,7 @@ FROM balenalib/%%BALENA_MACHINE_NAME%%-node:12-build as build
 WORKDIR /usr/src/app
 
 COPY package* ./
+COPY scripts ./scripts
 RUN npm ci
 
 COPY *config.js* ./
@@ -22,11 +23,11 @@ FROM balenalib/%%BALENA_MACHINE_NAME%%-node:12-run as result
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/bin ./bin
 COPY --from=build /usr/src/app/build ./
 COPY --from=build /usr/src/app/jest.config.js ./
 
 COPY test/entry.sh ./test/entry.sh
-
 ENV UDEV=1
 CMD ["/usr/src/app/test/entry.sh", "test"]
 

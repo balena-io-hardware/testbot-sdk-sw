@@ -127,7 +127,7 @@ export abstract class TestBot extends Board {
 		);
 	}
 
-	private async flashToDisk(
+	public async flashToDisk(
 		dst: sdk.sourceDestination.BlockDevice,
 		src: Stream.Readable,
 	) {
