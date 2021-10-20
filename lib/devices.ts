@@ -152,7 +152,7 @@ export class BeagleBone extends DeviceInteractor {
 		while (dutOn) {
 			console.log(`waiting for DUT to be off`);
 			dutOn = await this.checkDutPower();
-			await Bluebird.delay(1000 * 5); // 5 seconds between checks ( is it enough )
+			await Bluebird.delay(1000 * 60); // 60 seconds between checks ( is it enough )
 		}
 
 		// once the DUT is powered off again, we are done flashing (in theory) - not true, we need a window of time to wait, to confirm its actually a full power off
