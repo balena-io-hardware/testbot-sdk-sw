@@ -5,6 +5,7 @@ import {
 	IntelNuc,
 	BalenaFin,
 	BalenaFinV09,
+	BeagleBone,
 } from './devices';
 
 export {
@@ -14,4 +15,5 @@ export {
 	IntelNuc,
 	BalenaFin,
 	BalenaFinV09,
+	BeagleBone,
 };
