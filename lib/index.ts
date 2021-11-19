@@ -6,6 +6,7 @@ import {
 	BalenaFin,
 	BalenaFinV09,
 	BeagleBone,
+	RevPiCore3,
 } from './devices';
 
 export {
@@ -16,4 +17,5 @@ export {
 	BalenaFin,
 	BalenaFinV09,
 	BeagleBone,
+	RevPiCore3,
 };

@@ -6,6 +6,7 @@ import {
 	BalenaFin,
 	BalenaFinV09,
 	TestBotHat,
+	RevPiCore3,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -28,6 +29,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'intel-nuc': {
 			return {
 				deviceType: 'intel-nuc',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'revpi-core-3': {
+			return {
+				deviceType: 'revpi-core-3',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -114,6 +121,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'intel-nuc': {
 			return new IntelNuc(testbotHat);
+		}
+		case 'revpi-core-3': {
+			return new RevPiCore3(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);

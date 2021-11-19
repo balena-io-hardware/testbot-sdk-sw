@@ -326,6 +326,12 @@ export class BalenaFinV09 extends BalenaFin {
 	}
 }
 
+/** Implementation for Revolution Pi Core 3
+ * @remark
+ * This is similar to the Balena Fin
+ */
+export class RevPiCore3 extends BalenaFinV09 {}
+
 /** Implementation for Intel NUC devices. */
 export class IntelNuc extends DeviceInteractor {
 	constructor(testBot: TestBot) {
