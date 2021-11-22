@@ -129,21 +129,37 @@ export class BeagleBone extends DeviceInteractor {
 	}
 
 	async waitInternalFlash() {
-		// check if the DUT is on first
-		let dutOn = false;
-		while (!dutOn) {
-			console.log(`waiting for DUT to be on`);
-			dutOn = await this.checkDutPower();
-			await Bluebird.delay(1000 * 5); // 5 seconds between checks
-		}
-		// once we confirmed the DUT is on, we wait for it to power down again, which signals the flashing has finished
-		while (dutOn) {
-			console.log(`waiting for DUT to be off`);
-			dutOn = await this.checkDutPower();
-			await Bluebird.delay(1000 * 5); // 5 seconds between checks ( is it enough )
+		await this.testBot.powerOffDUT();
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.switchSdToDUT(5000); // Wait for 5s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
+		await this.testBot.powerOnDUT();
+
+		await Bluebird.delay(5000); // Wait 5s before measuring current for the first time, or we may power off again during flashing!
+		let current = await this.testBot.readVoutAmperage();
+		let timedOut = 0;
+		console.log('Initial current measurement:' + current + ' Amps');
+
+		const timeoutHandle = setTimeout(() => {
+			timedOut = 1;
+		}, 360000); // 6 minute timeout
+
+		while (current > 0.1 && timedOut === 0) {
+			await Bluebird.delay(5000); // Wait 5s before measuring current again.
+			current = await this.testBot.readVoutAmperage();
+			console.log(
+				'Awaiting DUT to flash internally and power down, current: ' + current + ' Amps',
+			);
 		}
 
-		// once the DUT is powered off again, we are done flashing (in theory) - not true, we need a window of time to wait, to confirm its actually a full power off
+		clearTimeout(timeoutHandle);
+		if (timedOut === 1) {
+			throw new Error('Timed out while waiting for DUT to flash');
+		} else {
+			console.log('Internally flashed - powering off DUT');
+			// Once current has dropped below the threshold, power off and toggle mux.
+			await this.testBot.powerOffDUT();
+			await this.testBot.switchSdToHost(1000);
+		}
 	}
 
 	async powerOn() {
@@ -159,12 +175,6 @@ export class BeagleBone extends DeviceInteractor {
 
 		// Flash the SD card
 		await this.testBot.flash(stream);
-
-		// toggle the SD card to DUT
-		await this.testBot.switchSdToDUT(1000);
-
-		// Power on DUT
-		await this.powerOn();
 
 		// wait for device to internally flash
 		await this.waitInternalFlash();
