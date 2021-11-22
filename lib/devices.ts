@@ -147,7 +147,9 @@ export class BeagleBone extends DeviceInteractor {
 			await Bluebird.delay(5000); // Wait 5s before measuring current again.
 			current = await this.testBot.readVoutAmperage();
 			console.log(
-				'Awaiting DUT to flash internally and power down, current: ' + current + ' Amps',
+				'Awaiting DUT to flash internally and power down, current: ' +
+					current +
+					' Amps',
 			);
 		}
 
