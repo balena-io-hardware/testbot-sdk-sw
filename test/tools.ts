@@ -8,6 +8,7 @@ import {
 	TestBotHat,
 	RevPiCore3,
 	CM4IOBoard,
+	Rpi243390,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -134,6 +135,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'raspberrypicm4-ioboard': {
 			return new CM4IOBoard(testbotHat);
+		}
+		case '243390-rpi3': {
+			return new Rpi243390(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);

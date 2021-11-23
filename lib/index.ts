@@ -8,6 +8,7 @@ import {
 	BeagleBone,
 	RevPiCore3,
 	CM4IOBoard,
+	Rpi243390,
 } from './devices';
 
 export {
@@ -20,4 +21,5 @@ export {
 	BeagleBone,
 	RevPiCore3,
 	CM4IOBoard,
+	Rpi243390,
 };
