@@ -95,6 +95,79 @@ export abstract class DeviceInteractor {
 	abstract async powerOn(): Promise<void>;
 }
 
+/**
+ * `DeviceInteractorFlasher` class can be used as a base class for interaction with a
+ * flasher DUT type (a DUT which boots the balenaOS flasher image from a removable media,
+ * either SD card or USB thumb drive, and waits for this flasher image to finish installing
+ * balenaOS onto the internal DUT storage).
+ *
+ *
+ */
+export abstract class FlasherDeviceInteractor extends DeviceInteractor {
+	/** All flasher DUTs should use the same power-on procedure */
+	async powerOn() {
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.switchSdToHost(1000);
+		await this.testBot.powerOnDUT();
+	}
+
+	/**
+	 * Flash the external media (SD card, USB thumb drive) with the balenaOS flasher then
+	 * let it boot and wait for the DUT to be flashed with balenaOS.
+	 *
+	 * @param stream The stream of the flasher image file to be flashed onto the external installer media
+	 */
+	async flash(stream: Stream.Readable) {
+		// first flash the external media
+		await this.testBot.flash(stream);
+		// wait for the DUT to self-shutdown after balenaOS flasher finishes provisiong the internal media
+		await this.waitInternalFlash();
+		// after the DUT has been provisioned with balenaOS, detach the external media from the DUT
+		await this.testBot.switchSdToHost(1000);
+	}
+
+	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
+	async waitInternalFlash() {
+		await this.testBot.powerOffDUT();
+		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
+		await this.testBot.setVout(this.powerVoltage);
+		console.log('Booting DUT with the balenaOS flasher image');
+		await this.testBot.powerOnDUT();
+
+		await Bluebird.delay(5000); // Wait 5s before measuring current for the first time, or we may power off again during flashing!
+		let current = await this.testBot.readVoutAmperage();
+		let timedOut = 0;
+		console.log('Initial current measurement:' + current + ' Amps');
+
+		const timeoutHandle = setTimeout(() => {
+			timedOut = 1;
+		}, 900000); // 15 minute timeout
+
+		// wait 60s before checking if the board performed a shutdown after flashing the internal storage
+		await Bluebird.delay(60000);
+
+		while (current > 0.1 && timedOut === 0) {
+			await Bluebird.delay(10000); // Wait 10s before measuring current again.
+			current = await this.testBot.readVoutAmperage();
+			console.log(
+				'Awaiting DUT to self power down after flashing the internal storage (current measurement: ' +
+					current +
+					' Amps)',
+			);
+		}
+
+		clearTimeout(timeoutHandle);
+		if (timedOut === 1) {
+			throw new Error('Timed out while waiting for DUT to flash');
+		} else {
+			console.log('Internally flashed - powering off DUT');
+			// Once current has dropped below the threshold, power off and toggle mux.
+			await this.testBot.powerOffDUT();
+			await this.testBot.switchSdToHost(1000);
+		}
+	}
+}
+
 /** Implementation for Raspberry Pi like devices. */
 export class RaspberryPi extends DeviceInteractor {
 	constructor(testBot: TestBot) {
@@ -122,69 +195,9 @@ export class CM4IOBoard extends DeviceInteractor {
 }
 
 /** Implementation for Beaglebone like devices. */
-export class BeagleBone extends DeviceInteractor {
+export class BeagleBone extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
 		super(testBot, 5);
-	}
-
-	async checkDutPower() {
-		const [stdout, stderr] = await exec(`cat /sys/class/net/eth1/carrier`);
-		console.log(stderr);
-		const file = stdout.toString();
-		if (file.includes('1')) {
-			console.log(`DUT is currently On`);
-			return true;
-		} else {
-			console.log(`DUT is currently Off`);
-			return false;
-		}
-	}
-
-	async waitInternalFlash() {
-		// check if the DUT is on first
-		let dutOn = false;
-		while (!dutOn) {
-			console.log(`waiting for DUT to be on`);
-			dutOn = await this.checkDutPower();
-			await Bluebird.delay(1000 * 5); // 5 seconds between checks
-		}
-		// once we confirmed the DUT is on, we wait for it to power down again, which signals the flashing has finished
-		while (dutOn) {
-			console.log(`waiting for DUT to be off`);
-			dutOn = await this.checkDutPower();
-			await Bluebird.delay(1000 * 5); // 5 seconds between checks ( is it enough )
-		}
-
-		// once the DUT is powered off again, we are done flashing (in theory) - not true, we need a window of time to wait, to confirm its actually a full power off
-	}
-
-	async powerOn() {
-		await this.testBot.setVout(this.powerVoltage);
-		await this.testBot.powerOnDUT();
-	}
-
-	async flash(stream: Stream.Readable) {
-		console.log('Entering flash method for Beaglebone');
-
-		// power off first
-		await this.powerOff();
-
-		// Flash the SD card
-		await this.testBot.flash(stream);
-
-		// toggle the SD card to DUT
-		await this.testBot.switchSdToDUT(1000);
-
-		// Power on DUT
-		await this.powerOn();
-
-		// wait for device to internally flash
-		await this.waitInternalFlash();
-
-		console.log(`Device flashed`);
-
-		await this.powerOff();
-		await this.testBot.switchSdToHost(1000);
 	}
 }
 
