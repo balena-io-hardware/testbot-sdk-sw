@@ -12,6 +12,7 @@ import {
 	CoralDevBoard,
 	JetsonNano,
 	Rockpi4bRk3399,
+	Rpi243390,
 } from './devices';
 
 export {
@@ -28,4 +29,5 @@ export {
 	CoralDevBoard,
 	JetsonNano,
 	Rockpi4bRk3399,
+	Rpi243390,
 };

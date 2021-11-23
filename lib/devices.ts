@@ -419,6 +419,143 @@ export class BalenaFinV09 extends BalenaFin {
  */
 export class RevPiCore3 extends BalenaFinV09 {}
 
+/** Implementation for 243390-Rpi3
+ */
+export class Rpi243390 extends DeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
+	}
+
+	readonly OUTPUT_DIR = path.join(__dirname, '..', 'bin', '/');
+
+	// usb-toggle
+	async toggleUsb(state: boolean, port: number) {
+		console.log(`Toggling USB ${state ? 'on' : 'off'}`);
+		await exec(
+			`${this.OUTPUT_DIR}uhubctl -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
+		);
+	}
+
+	async flash(stream: Stream.Readable) {
+		let tries = 0;
+		while (tries < 3) {
+			console.log(`Entering flash method for Rpi243390, attempt ${tries + 1}`);
+
+			await this.toggleUsb(false, 4);
+			await this.testBot.powerOffDUT();
+			await Bluebird.delay(1000); // Wait 8s before trying to turning USB back on
+
+			await this.powerOnFlash();
+			// etcher-sdk (power on) usboot
+			const adapters: sdk.scanner.adapters.Adapter[] = [
+				new sdk.scanner.adapters.BlockDeviceAdapter(() => false),
+				new sdk.scanner.adapters.UsbbootDeviceAdapter(),
+			];
+			const deviceScanner = new sdk.scanner.Scanner(adapters);
+			console.log('Waiting for eMMC');
+			// Wait for compute module to appear over usb
+			const computeModule: sdk.sourceDestination.UsbbootDrive = await new Promise(
+				(resolve, reject) => {
+					function onAttach(
+						drive: sdk.scanner.adapters.AdapterSourceDestination,
+					) {
+						if (drive instanceof sdk.sourceDestination.UsbbootDrive) {
+							deviceScanner.removeListener('attach', onAttach);
+							resolve(drive);
+						}
+					}
+					deviceScanner.on('attach', onAttach);
+					deviceScanner.on('error', reject);
+					deviceScanner.start();
+				},
+			);
+			console.log('Compute module attached');
+			// wait to convert to block device.
+			await new Promise<void>((resolve, reject) => {
+				function onDetach(
+					drive: sdk.scanner.adapters.AdapterSourceDestination,
+				) {
+					if (drive === computeModule) {
+						deviceScanner.removeListener('detach', onDetach);
+						resolve();
+					}
+				}
+				deviceScanner.on('detach', onDetach);
+				deviceScanner.on('error', reject);
+			});
+
+			// start a timeout - if the fin takes too long to appear as a block device, we must retry from the beginning
+
+			console.log('Waiting for eMMC to reattach as a block device');
+
+			// let reAttachFail = false;
+			const dest = await new Promise(
+				(
+					resolve: (drive: sdk.sourceDestination.BlockDevice) => void,
+					reject,
+				) => {
+					const timeout = setTimeout(() => {
+						clearTimeout(timeout);
+						console.log(`DEBUG: Timed out!`);
+						reject();
+					}, 1000 * 60 * 5);
+
+					function onAttach(
+						drive: sdk.scanner.adapters.AdapterSourceDestination,
+					) {
+						if (
+							drive instanceof sdk.sourceDestination.BlockDevice &&
+							drive.description === 'Compute Module'
+						) {
+							console.log('Attached compute module.');
+							clearTimeout(timeout);
+							resolve(drive);
+							deviceScanner.removeListener('attach', onAttach);
+						} else {
+							console.log('Drive is ' + drive.description);
+						}
+					}
+					deviceScanner.on('attach', onAttach);
+					deviceScanner.on('error', reject);
+				},
+			).catch(() => {
+				console.log(`Caught promise reject`);
+				// reAttachFail = true
+			});
+			deviceScanner.stop();
+
+			if (dest instanceof Object) {
+				await Bluebird.delay(1000); // Wait 1s before trying to flash
+				console.log('Flashing started...');
+				await this.testBot.flashToDisk(dest, stream);
+				console.log('Flashed!');
+				break;
+			}
+
+			console.log(`Flashing failed`);
+			tries++;
+		}
+		await this.toggleUsb(false, 4);
+		await this.testBot.powerOffDUT();
+	}
+
+	async powerOn() {
+		console.log('Powering on RPI 243390');
+		await this.toggleUsb(false, 4);
+		await Bluebird.delay(1000 * 8);
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.powerOnDUT();
+	}
+
+	protected async powerOnFlash() {
+		await this.toggleUsb(false, 4);
+		await Bluebird.delay(1000); // Wait 1s before trying to turning USB back on
+		await this.toggleUsb(true, 4);
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.powerOnDUT();
+	}
+}
+
 /** Implementation for Intel NUC devices. */
 export class IntelNuc extends DeviceInteractor {
 	constructor(testBot: TestBot) {
