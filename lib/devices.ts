@@ -119,8 +119,11 @@ export abstract class FlasherDeviceInteractor extends DeviceInteractor {
 	 * @param stream The stream of the flasher image file to be flashed onto the external installer media
 	 */
 	async flash(stream: Stream.Readable) {
+		if (stream) {
+			console.log('Skipping');
+		}
 		// first flash the external media
-		await this.testBot.flash(stream);
+		// await this.testBot.flash(stream);
 		// wait for the DUT to self-shutdown after balenaOS flasher finishes provisiong the internal media
 		await this.waitInternalFlash();
 		// after the DUT has been provisioned with balenaOS, detach the external media from the DUT
