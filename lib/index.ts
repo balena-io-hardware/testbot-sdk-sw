@@ -7,6 +7,7 @@ import {
 	BalenaFinV09,
 	BeagleBone,
 	RevPiCore3,
+	CM4IOBoard,
 } from './devices';
 
 export {
@@ -18,4 +19,5 @@ export {
 	BalenaFinV09,
 	BeagleBone,
 	RevPiCore3,
+	CM4IOBoard,
 };

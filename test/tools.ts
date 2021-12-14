@@ -7,6 +7,7 @@ import {
 	BalenaFinV09,
 	TestBotHat,
 	RevPiCore3,
+	CM4IOBoard,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -35,6 +36,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'revpi-core-3': {
 			return {
 				deviceType: 'revpi-core-3',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'raspberrypicm4-ioboard': {
+			return {
+				deviceType: 'raspberrypicm4-ioboard',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -124,6 +131,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'revpi-core-3': {
 			return new RevPiCore3(testbotHat);
+		}
+		case 'raspberrypicm4-ioboard': {
+			return new CM4IOBoard(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);
