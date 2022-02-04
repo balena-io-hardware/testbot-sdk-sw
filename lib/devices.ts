@@ -4,6 +4,7 @@ import * as Stream from 'stream';
 import * as zlib from 'zlib';
 import { TestBot } from './base';
 import * as sdk from 'etcher-sdk';
+import { BlockDeviceAdapter } from 'etcher-sdk/build/scanner/adapters';
 import { exec } from 'mz/child_process';
 
 const POLL_INTERVAL = 1000; // 1 second
@@ -266,7 +267,7 @@ export class BalenaFin extends DeviceInteractor {
 			await this.powerOnFlash();
 			// etcher-sdk (power on) usboot
 			const adapters: sdk.scanner.adapters.Adapter[] = [
-				new sdk.scanner.adapters.BlockDeviceAdapter(() => false),
+				new BlockDeviceAdapter({ includeSystemDrives: () => false }),
 				new sdk.scanner.adapters.UsbbootDeviceAdapter(),
 			];
 			const deviceScanner = new sdk.scanner.Scanner(adapters);
@@ -392,14 +393,14 @@ export class Rpi243390 extends DeviceInteractor {
 		super(testBot, 5);
 	}
 
-	readonly OUTPUT_DIR = path.join(__dirname, '..', 'bin', '/');
-
 	// usb-toggle
 	async toggleUsb(state: boolean, port: number) {
 		console.log(`Toggling USB ${state ? 'on' : 'off'}`);
 		await exec(
-			`${this.OUTPUT_DIR}uhubctl -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
-		);
+			`uhubctl -r 1000 -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
+		).catch(() => {
+			console.log(`Failed. Check that uhubctl is available.`);
+		});
 	}
 
 	async flash(stream: Stream.Readable) {
@@ -414,7 +415,7 @@ export class Rpi243390 extends DeviceInteractor {
 			await this.powerOnFlash();
 			// etcher-sdk (power on) usboot
 			const adapters: sdk.scanner.adapters.Adapter[] = [
-				new sdk.scanner.adapters.BlockDeviceAdapter(() => false),
+				new BlockDeviceAdapter({ includeSystemDrives: () => false }),
 				new sdk.scanner.adapters.UsbbootDeviceAdapter(),
 			];
 			const deviceScanner = new sdk.scanner.Scanner(adapters);
