@@ -203,6 +203,10 @@ export class BalenaFin extends DeviceInteractor {
 	// usb-toggle
 	async toggleUsb(state: boolean, port: number) {
 		console.log(`Toggling USB ${state ? 'on' : 'off'}`);
+		// we will do this twice, as there could be issues with the driver that cause the hub to re-power the device (https://github.com/balena-io-hardware/balena-fulfillment-rig/blob/master/core/app/utils/dut-power/index.js#L26)
+		await exec(
+			`${this.OUTPUT_DIR}uhubctl -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
+		);
 		await exec(
 			`${this.OUTPUT_DIR}uhubctl -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
 		);
