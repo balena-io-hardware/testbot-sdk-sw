@@ -4,7 +4,6 @@ import * as Stream from 'stream';
 import * as zlib from 'zlib';
 import { TestBot } from './base';
 import * as sdk from 'etcher-sdk';
-import * as path from 'path';
 import { exec } from 'mz/child_process';
 // import * as retry from 'bluebird-retry';
 
@@ -198,18 +197,14 @@ export class BalenaFin extends DeviceInteractor {
 		super(testBot, 12);
 	}
 
-	readonly OUTPUT_DIR = path.join(__dirname, '..', 'bin', '/');
-
 	// usb-toggle
 	async toggleUsb(state: boolean, port: number) {
 		console.log(`Toggling USB ${state ? 'on' : 'off'}`);
-		// we will do this twice, as there could be issues with the driver that cause the hub to re-power the device (https://github.com/balena-io-hardware/balena-fulfillment-rig/blob/master/core/app/utils/dut-power/index.js#L26)
 		await exec(
-			`${this.OUTPUT_DIR}uhubctl -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
-		);
-		await exec(
-			`${this.OUTPUT_DIR}uhubctl -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
-		);
+			`uhubctl -r 1000 -a ${state ? 'on' : 'off'} -p ${port} -l 1-1`,
+		).catch(() => {
+			console.log(`Failed. Check that uhubctl is available.`);
+		});
 	}
 
 	protected async powerOnFlash() {

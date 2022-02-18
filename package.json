@@ -18,9 +18,7 @@
     "clean": "rimraf build",
     "docs": "rimraf docs/ && npx typedoc lib/ --readme README.md --excludePrivate --excludeProtected --includeVersion --exclude 'lib/base.ts' --excludeExternals",
     "build": "npm run test && npm run docs && tsc",
-    "prepack": "npm run build && npm run uhubctl",
-    "postinstall": "npm run uhubctl",
-    "uhubctl": "node scripts/install-binary.js"
+    "prepack": "npm run build"
   },
   "dependencies": {
     "@types/node": "^10.12.18",
