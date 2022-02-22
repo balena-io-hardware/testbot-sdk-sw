@@ -5,6 +5,9 @@ import * as zlib from 'zlib';
 import { TestBot } from './base';
 import * as sdk from 'etcher-sdk';
 import { exec } from 'mz/child_process';
+
+const POLL_INTERVAL = 1000; // 1 second
+const POLL_TRIES = 20; // 20 tries
 // import * as retry from 'bluebird-retry';
 
 /**
@@ -158,9 +161,28 @@ export abstract class FlasherDeviceInteractor extends DeviceInteractor {
 		// wait initially for 60s and then every 10s before checking if the board performed a shutdown after flashing the internal storage
 		await Bluebird.delay(1000 * 60);
 		while (dutOn) {
+			await Bluebird.delay(1000 * 10); // 10 seconds between checks
 			console.log(`waiting for DUT to be off`);
 			dutOn = await this.checkDutPower();
-			await Bluebird.delay(1000 * 10); // 10 seconds between checks ( is it enough )
+			// occasionally the DUT might appear to be powered down, but it isn't - we want to confirm that the DUT has stayed off for an interval of time
+			if (!dutOn) {
+				let offCount = 0;
+				console.log(`detected DUT has powered off - confirming...`);
+				for (let tries = 0; tries < POLL_TRIES; tries++) {
+					await Bluebird.delay(POLL_INTERVAL);
+					dutOn = await this.checkDutPower();
+					if (!dutOn) {
+						offCount += 1;
+					}
+				}
+				console.log(
+					`DUT stayted off for ${offCount} checks, expected: ${POLL_TRIES}`,
+				);
+				if (offCount !== POLL_TRIES) {
+					// if the DUT didn't stay off, then we must try the loop again
+					dutOn = true;
+				}
+			}
 		}
 
 		if (dutOn) {
