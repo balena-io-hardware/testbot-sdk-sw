@@ -250,7 +250,7 @@ export class BalenaFin extends DeviceInteractor {
 
 	protected async powerOnFlash() {
 		await this.toggleUsb(false, 4);
-		await Bluebird.delay(1000 * 8); // Wait 8s before trying to turning USB back on
+		await Bluebird.delay(1000); // Wait 8s before trying to turning USB back on
 		await this.toggleUsb(true, 4);
 	}
 
@@ -316,7 +316,7 @@ export class BalenaFin extends DeviceInteractor {
 						clearTimeout(timeout);
 						console.log(`DEBUG: Timed out!`);
 						reject();
-					}, 1000 * 60 * 5);
+					}, 1000 * 60);
 
 					function onAttach(
 						drive: sdk.scanner.adapters.AdapterSourceDestination,
@@ -358,7 +358,7 @@ export class BalenaFin extends DeviceInteractor {
 	async powerOn() {
 		console.log('Powering on Fin');
 		await this.toggleUsb(false, 4);
-		await Bluebird.delay(1000 * 8);
+		await Bluebird.delay(1000);
 		await this.testBot.setVout(this.powerVoltage);
 		await this.testBot.powerOnDUT();
 	}
