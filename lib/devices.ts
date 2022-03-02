@@ -340,7 +340,8 @@ export class BalenaFin extends DeviceInteractor {
 				// reAttachFail = true
 			});
 			deviceScanner.stop();
-
+			console.log(`DEST::`);
+			console.log(dest);
 			if (dest instanceof Object) {
 				await Bluebird.delay(1000); // Wait 1s before trying to flash
 				console.log('Flashing started...');

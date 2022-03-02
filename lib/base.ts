@@ -133,7 +133,7 @@ export abstract class TestBot extends Board {
 		src: Stream.Readable,
 	) {
 		const sdkSource = new sdk.sourceDestination.SingleUseStreamSource(src);
-
+		console.log(`TRYING TO FLASH::`);
 		const result = await sdk.multiWrite.pipeSourceToDestinations(
 			sdkSource,
 			// @ts-ignore
@@ -148,6 +148,7 @@ export abstract class TestBot extends Board {
 			const errorsMessage = new Array(...result.failures.values())
 				.map((e) => e.message)
 				.join('\n');
+			console.log(`ERROR: ${errorsMessage}`);
 			throw new Error(
 				`Flashing failed with the following errors: ${errorsMessage}`,
 			);
