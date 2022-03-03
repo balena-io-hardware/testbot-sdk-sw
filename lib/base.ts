@@ -132,14 +132,29 @@ export abstract class TestBot extends Board {
 		dst: sdk.sourceDestination.BlockDevice,
 		src: Stream.Readable,
 	) {
-		const sdkSource = new sdk.sourceDestination.SingleUseStreamSource(src);
+		// const sdkSource = new sdk.sourceDestination.SourceDestination(src);
+		const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.SingleUseStreamSource(
+			src,
+		);
+
+		console.log(`STREAM METADATA:`);
+		console.log(await sdkSource.getMetadata());
+
 		console.log(`TRYING TO FLASH::`);
 		const result = await sdk.multiWrite.pipeSourceToDestinations({
 			source: sdkSource,
 			destinations: [dst],
-			onFail: (_: any, error: Error) =>
-				this.log(`Failure during flashing: ${error}`),
+			onFail: (
+				destination: sdk.sourceDestination.SourceDestination,
+				error: Error,
+			) => {
+				console.log(`FLASH ERROR:`);
+				console.log(error);
+				console.log(destination);
+				this.log(`Failure during flashing: ${error}`);
+			},
 			onProgress: (progress: sdk.multiWrite.MultiDestinationProgress) => {
+				console.log(progress);
 				this.emit('progress', progress);
 			},
 			verify: true,
