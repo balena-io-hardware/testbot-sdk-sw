@@ -377,7 +377,7 @@ export class BalenaFin extends DeviceInteractor {
 			console.log(`DEST::`);
 			console.log(dest);
 			if (dest instanceof Object) {
-				await Bluebird.delay(1000); // Wait 1s before trying to flash
+				await Bluebird.delay(5000); // Wait 1s before trying to flash
 				console.log('Flashing started...');
 				await this.testBot.flashToDisk(dest, stream);
 				console.log('Flashed!');
