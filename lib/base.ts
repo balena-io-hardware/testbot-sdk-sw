@@ -6,6 +6,8 @@ import * as Board from 'firmata';
 import { fs } from 'mz';
 import * as SerialPort from 'serialport';
 import * as Stream from 'stream';
+import * as util from 'util';
+const pipeline = util.promisify(Stream.pipeline);
 
 Bluebird.config({
 	cancellation: true,
@@ -133,12 +135,21 @@ export abstract class TestBot extends Board {
 		src: Stream.Readable,
 	) {
 		// const sdkSource = new sdk.sourceDestination.SourceDestination(src);
-		const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.SingleUseStreamSource(
+		/*const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.SingleUseStreamSource(
 			src,
-		);
+		);*/
 
-		console.log(`STREAM METADATA:`);
-		console.log(await sdkSource.getMetadata());
+		const filePath = `/tmp/img.img`;
+		console.log(`Piping stream to file`);
+		await pipeline(src, fs.createWriteStream(filePath)).catch((e) => {
+			console.log(`Error piping image to file: ${e}`);
+		});
+
+		const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.File(
+			{
+				path: filePath,
+			},
+		);
 
 		console.log(`TRYING TO FLASH::`);
 		const result = await sdk.multiWrite.pipeSourceToDestinations({
