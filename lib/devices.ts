@@ -393,45 +393,8 @@ export class BalenaFinV09 extends BalenaFin {
 export class RevPiCore3 extends BalenaFinV09 {}
 
 /** Implementation for Intel NUC devices. */
-export class IntelNuc extends DeviceInteractor {
+export class IntelNuc extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
-		super(testBot, 12);
-	}
-
-	async powerOn() {
-		await this.testBot.powerOffDUT();
-		await this.testBot.setVout(this.powerVoltage);
-		await this.testBot.switchSdToDUT(5000); // Wait for 5s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
-		await this.testBot.powerOnDUT();
-
-		await Bluebird.delay(5000); // Wait 5s before measuring current for the first time, or we may power off again during flashing!
-		let current = await this.testBot.readVoutAmperage();
-		let timedOut = 0;
-		console.log('Initial current measurement:' + current + ' Amps');
-
-		const timeoutHandle = setTimeout(() => {
-			timedOut = 1;
-		}, 360000); // 6 minute timeout
-
-		while (current > 0.1 && timedOut === 0) {
-			await Bluebird.delay(5000); // Wait 5s before measuring current again.
-			current = await this.testBot.readVoutAmperage();
-			console.log(
-				'Awaiting DUT to flash and power down, current: ' + current + ' Amps',
-			);
-		}
-
-		clearTimeout(timeoutHandle);
-		if (timedOut === 1) {
-			throw new Error('Timed out while waiting for DUT to flash');
-		} else {
-			console.log('Internally flashed - powering off DUT');
-			// Once current has dropped below the threshold, power off and toggle mux.
-			await this.testBot.powerOffDUT();
-			await this.testBot.switchSdToHost(1000);
-			// Turn power back on, this should now get the NUC to boot from internal mmc as USB is no longer connected.
-			await this.testBot.powerOnDUT();
-			console.log('Powering on DUT - should now boot from internal storage');
-		}
+		super(testBot, 19);
 	}
 }
