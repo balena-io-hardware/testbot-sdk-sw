@@ -151,7 +151,7 @@ export abstract class TestBot extends Board {
 			},
 		);
 
-		console.log(`INNER SOURCE`)
+		console.log(`INNER SOURCE`);
 		const innerSource = await sdkSource.getInnerSource();
 
 		console.log(`TRYING TO FLASH::`);
