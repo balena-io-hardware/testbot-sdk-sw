@@ -151,9 +151,12 @@ export abstract class TestBot extends Board {
 			},
 		);
 
+		console.log(`INNER SOURCE`)
+		const innerSource = await sdkSource.getInnerSource();
+
 		console.log(`TRYING TO FLASH::`);
 		const result = await sdk.multiWrite.pipeSourceToDestinations({
-			source: sdkSource,
+			source: innerSource,
 			destinations: [dst],
 			onFail: (
 				destination: sdk.sourceDestination.SourceDestination,
