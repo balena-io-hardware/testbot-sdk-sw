@@ -27,7 +27,7 @@
     "bluebird-retry": "^0.11.0",
     "decompress": "^4.2.1",
     "download": "^8.0.0",
-    "etcher-sdk": "^7.0.1",
+    "etcher-sdk": "6.1.0",
     "firmata": "^2.2.0",
     "lodash": "^4.17.15",
     "mz": "^2.7.0",
