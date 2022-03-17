@@ -11,6 +11,8 @@ services:
     restart: no
     volumes:
       - os-images:/images
+    labels:
+      io.balena.features.sysfs: '1'
   # REPL for testbot HAT.
   # repl:
   #   build: .
