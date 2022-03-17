@@ -229,6 +229,13 @@ export class BeagleBone extends FlasherDeviceInteractor {
 	}
 }
 
+/** Implementation for IMX8MM EBCRS A2 */
+export class Imx8mmebcrs08a2 extends FlasherDeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 12);
+	}
+}
+
 /** Implementation for balenaFin v1.1.x (V10+)
  * @remark
  * For the balenaFin `v1.0.0`, see the [[BalenaFinV09]] child class.
