@@ -9,6 +9,7 @@ import {
 	RevPiCore3,
 	CM4IOBoard,
 	Imx8mmebcrs08a2,
+	CoralDevBoard,
 } from './devices';
 
 export {
@@ -22,4 +23,5 @@ export {
 	RevPiCore3,
 	CM4IOBoard,
 	Imx8mmebcrs08a2,
+	CoralDevBoard,
 };

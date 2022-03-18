@@ -236,6 +236,13 @@ export class Imx8mmebcrs08a2 extends FlasherDeviceInteractor {
 	}
 }
 
+/** Implementation for the Coral Dev Board */
+export class CoralDevBoard extends FlasherDeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
+	}
+}
+
 /** Implementation for balenaFin v1.1.x (V10+)
  * @remark
  * For the balenaFin `v1.0.0`, see the [[BalenaFinV09]] child class.
