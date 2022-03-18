@@ -10,6 +10,7 @@ import {
 	CM4IOBoard,
 	Imx8mmebcrs08a2,
 	CoralDevBoard,
+	JetsonNano,
 } from './devices';
 
 export {
@@ -24,4 +25,5 @@ export {
 	CM4IOBoard,
 	Imx8mmebcrs08a2,
 	CoralDevBoard,
+	JetsonNano,
 };

@@ -10,6 +10,7 @@ import {
 	CM4IOBoard,
 	Imx8mmebcrs08a2,
 	CoralDevBoard,
+	JetsonNano,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -56,6 +57,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'coral-dev': {
 			return {
 				deviceType: 'coral-dev',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'jetson-nano': {
+			return {
+				deviceType: 'jetson-nano',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -154,6 +161,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'coral-dev': {
 			return new CoralDevBoard(testbotHat);
+		}
+		case 'jetson-nano': {
+			return new JetsonNano(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);
