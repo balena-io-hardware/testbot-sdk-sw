@@ -209,6 +209,19 @@ export class RaspberryPi extends DeviceInteractor {
 	}
 }
 
+/** Implementation for Jetson Nano SD-CARD device. */
+export class JetsonNano extends DeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
+	}
+
+	async powerOn() {
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.switchSdToDUT(1000);
+		await this.testBot.powerOnDUT();
+	}
+}
+
 /** Implementation for CM4 IO-Board */
 export class CM4IOBoard extends DeviceInteractor {
 	constructor(testBot: TestBot) {
@@ -233,6 +246,13 @@ export class BeagleBone extends FlasherDeviceInteractor {
 export class Imx8mmebcrs08a2 extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
 		super(testBot, 12);
+	}
+}
+
+/** Implementation for the Coral Dev Board */
+export class CoralDevBoard extends FlasherDeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
 	}
 }
 

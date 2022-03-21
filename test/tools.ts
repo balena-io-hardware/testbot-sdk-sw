@@ -9,6 +9,8 @@ import {
 	RevPiCore3,
 	CM4IOBoard,
 	Imx8mmebcrs08a2,
+	CoralDevBoard,
+	JetsonNano,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -49,6 +51,18 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'imx8mmebcrs08a2': {
 			return {
 				deviceType: 'imx8mmebcrs08a2',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'coral-dev': {
+			return {
+				deviceType: 'coral-dev',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'jetson-nano': {
+			return {
+				deviceType: 'jetson-nano',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -144,6 +158,12 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'imx8mmebcrs08a2': {
 			return new Imx8mmebcrs08a2(testbotHat);
+		}
+		case 'coral-dev': {
+			return new CoralDevBoard(testbotHat);
+		}
+		case 'jetson-nano': {
+			return new JetsonNano(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);
