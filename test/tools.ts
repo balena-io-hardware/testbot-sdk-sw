@@ -11,6 +11,7 @@ import {
 	Imx8mmebcrs08a2,
 	CoralDevBoard,
 	JetsonNano,
+	Rockpi4bRk3399,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -63,6 +64,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'jetson-nano': {
 			return {
 				deviceType: 'jetson-nano',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'rockpi-4b-rk3399': {
+			return {
+				deviceType: 'rockpi-4b-rk3399',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -164,6 +171,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'jetson-nano': {
 			return new JetsonNano(testbotHat);
+		}
+		case 'rockpi-4b-rk3399': {
+			return new Rockpi4bRk3399(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);
