@@ -11,6 +11,7 @@ import {
 	Imx8mmebcrs08a2,
 	CoralDevBoard,
 	JetsonNano,
+	Rockpi4bRk3399,
 } from './devices';
 
 export {
@@ -26,4 +27,5 @@ export {
 	Imx8mmebcrs08a2,
 	CoralDevBoard,
 	JetsonNano,
+	Rockpi4bRk3399,
 };
