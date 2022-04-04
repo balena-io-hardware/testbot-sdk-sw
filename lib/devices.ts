@@ -300,7 +300,9 @@ export class BalenaFin extends DeviceInteractor {
 			await this.powerOnFlash();
 			// etcher-sdk (power on) usboot
 			const adapters: sdk.scanner.adapters.Adapter[] = [
-				new sdk.scanner.adapters.BlockDeviceAdapter(() => false),
+				new sdk.scanner.adapters.BlockDeviceAdapter({
+					includeSystemDrives: () => false,
+				}),
 				new sdk.scanner.adapters.UsbbootDeviceAdapter(),
 			];
 			const deviceScanner = new sdk.scanner.Scanner(adapters);

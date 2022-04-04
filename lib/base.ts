@@ -24,7 +24,9 @@ async function getDrive(
 	device: string,
 ): Promise<sdk.sourceDestination.BlockDevice> {
 	// Do not include system drives in our search
-	const adapter = new sdk.scanner.adapters.BlockDeviceAdapter(() => false);
+	const adapter = new sdk.scanner.adapters.BlockDeviceAdapter({
+		includeSystemDrives: () => false,
+	});
 	const scanner = new sdk.scanner.Scanner([adapter]);
 
 	await scanner.start();
