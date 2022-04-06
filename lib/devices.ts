@@ -63,6 +63,14 @@ export abstract class DeviceInteractor {
 		await this.testBot.flash(stream);
 	}
 
+	async toggleMux(direction: any) {
+		if (direction === 'dut') {
+			await this.testBot.switchSdToDUT(1000);
+		} else {
+			await this.testBot.switchSdToHost(1000);
+		}
+	}
+
 	/**
 	 * Specify filepath of image to flash and creates a stream of the image. Image
 	 * file should be compressed with gzip compressions (having file extension `.gz`).
