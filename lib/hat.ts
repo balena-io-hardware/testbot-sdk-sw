@@ -177,9 +177,9 @@ export class TestBotHat extends TestBot {
 	 *  The method enables level shifter output before reading from UART. Two coprocessor pins
 	 *  control different level shifters for different GPIO pins.
 	 *
-	 *  @returns returns DUT output stream if available.
+	 *  @returns returns DUT input/output stream if available.
 	 */
-	public async openDutSerial(): Promise<Stream.Readable | null> {
+	public async openDutSerial(): Promise<Stream.Duplex | null> {
 		await this.digitalWrite(TestBotHat.PINS.OE_TXB, this.HIGH);
 		await this.digitalWrite(TestBotHat.PINS.OE_TXS, this.HIGH);
 

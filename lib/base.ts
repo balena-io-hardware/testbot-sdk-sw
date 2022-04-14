@@ -173,7 +173,7 @@ export abstract class TestBot extends Board {
 	}
 
 	/** Open the DUT serial output stream if it's available. */
-	public async openDutSerial(): Promise<Stream.Readable | null> {
+	public async openDutSerial(): Promise<Stream.Duplex | null> {
 		if (this.dutSerialPort != null) {
 			return this.dutSerialPort;
 		}
