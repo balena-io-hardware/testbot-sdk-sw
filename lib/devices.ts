@@ -444,12 +444,16 @@ export class Rpi243390 extends DeviceInteractor {
 
 			await this.toggleUsb(false, 4);
 			await this.testBot.powerOffDUT();
-			await Bluebird.delay(1000); // Wait 8s before trying to turning USB back on
-
+			await Bluebird.delay(1000); // Wait 1s before trying to turning USB back on
 			await this.powerOnFlash();
 			// etcher-sdk (power on) usboot
 			const adapters: sdk.scanner.adapters.Adapter[] = [
-				new BlockDeviceAdapter({ includeSystemDrives: () => false }),
+				new BlockDeviceAdapter({
+					includeSystemDrives: () => false,
+					unmountOnSuccess: false,
+					write: true,
+					direct: true,
+				}),
 				new sdk.scanner.adapters.UsbbootDeviceAdapter(),
 			];
 			const deviceScanner = new sdk.scanner.Scanner(adapters);
@@ -552,6 +556,7 @@ export class Rpi243390 extends DeviceInteractor {
 		await this.toggleUsb(false, 4);
 		await Bluebird.delay(1000); // Wait 1s before trying to turning USB back on
 		await this.toggleUsb(true, 4);
+		await Bluebird.delay(5000);
 		await this.testBot.setVout(this.powerVoltage);
 		await this.testBot.powerOnDUT();
 	}
