@@ -6,6 +6,8 @@ import * as Board from 'firmata';
 import { fs } from 'mz';
 import * as SerialPort from 'serialport';
 import * as Stream from 'stream';
+import * as util from 'util';
+const pipeline = util.promisify(Stream.pipeline);
 
 Bluebird.config({
 	cancellation: true,
@@ -137,10 +139,20 @@ export abstract class TestBot extends Board {
 		dst: sdk.sourceDestination.BlockDevice,
 		src: Stream.Readable,
 	) {
-		const sdkSource = new sdk.sourceDestination.SingleUseStreamSource(src);
+		const filePath = `/tmp/img.img`;
+		console.log(`Piping stream to file`);
+		await pipeline(src, fs.createWriteStream(filePath)).catch((e) => {
+			console.log(`Error piping image to file: ${e}`);
+		});
 
+		const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.File(
+			{
+				path: filePath,
+			},
+		);
+		const innerSource = await sdkSource.getInnerSource();
 		const result = await sdk.multiWrite.pipeSourceToDestinations({
-			source: sdkSource,
+			source: innerSource,
 			destinations: [dst],
 			onFail: (_: any, error: Error) =>
 				this.log(`Failure during flashing: ${error}`),
