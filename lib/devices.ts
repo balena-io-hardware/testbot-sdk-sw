@@ -285,7 +285,7 @@ export class BalenaFin extends DeviceInteractor {
 
 	protected async powerOnFlash() {
 		await this.toggleUsb(false, 4);
-		await Bluebird.delay(1000); // Wait 8s before trying to turning USB back on
+		await Bluebird.delay(2000); // Wait 8s before trying to turning USB back on
 		await this.toggleUsb(true, 4);
 	}
 
@@ -296,12 +296,17 @@ export class BalenaFin extends DeviceInteractor {
 
 			await this.toggleUsb(false, 4);
 			await this.testBot.powerOffDUT();
-			await Bluebird.delay(1000); // Wait 8s before trying to turning USB back on
+			await Bluebird.delay(1000 * 8); // Wait 5s before trying to turning USB back on
 
 			await this.powerOnFlash();
 			// etcher-sdk (power on) usboot
 			const adapters: sdk.scanner.adapters.Adapter[] = [
-				new BlockDeviceAdapter({ includeSystemDrives: () => false }),
+				new BlockDeviceAdapter({
+					includeSystemDrives: () => false,
+					unmountOnSuccess: false,
+					write: true,
+					direct: true,
+				}),
 				new sdk.scanner.adapters.UsbbootDeviceAdapter(),
 			];
 			const deviceScanner = new sdk.scanner.Scanner(adapters);
@@ -351,7 +356,7 @@ export class BalenaFin extends DeviceInteractor {
 						clearTimeout(timeout);
 						console.log(`DEBUG: Timed out!`);
 						reject();
-					}, 1000 * 60);
+					}, 1000 * 60 * 5);
 
 					function onAttach(
 						drive: sdk.scanner.adapters.AdapterSourceDestination,
