@@ -12,6 +12,7 @@ import {
 	CoralDevBoard,
 	JetsonNano,
 	Rockpi4bRk3399,
+	Rpi243390,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -174,6 +175,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'rockpi-4b-rk3399': {
 			return new Rockpi4bRk3399(testbotHat);
+		}
+		case '243390-rpi3': {
+			return new Rpi243390(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);

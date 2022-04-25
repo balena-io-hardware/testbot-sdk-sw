@@ -1,10 +1,13 @@
 import * as Bluebird from 'bluebird';
 import * as retry from 'bluebird-retry';
 import * as sdk from 'etcher-sdk';
+import { BlockDeviceAdapter } from 'etcher-sdk/build/scanner/adapters';
 import * as Board from 'firmata';
 import { fs } from 'mz';
 import * as SerialPort from 'serialport';
 import * as Stream from 'stream';
+import * as util from 'util';
+const pipeline = util.promisify(Stream.pipeline);
 
 Bluebird.config({
 	cancellation: true,
@@ -24,7 +27,12 @@ async function getDrive(
 	device: string,
 ): Promise<sdk.sourceDestination.BlockDevice> {
 	// Do not include system drives in our search
-	const adapter = new sdk.scanner.adapters.BlockDeviceAdapter(() => false);
+	const adapter = new BlockDeviceAdapter({
+		includeSystemDrives: () => false,
+		unmountOnSuccess: false,
+		write: true,
+		direct: true,
+	});
 	const scanner = new sdk.scanner.Scanner([adapter]);
 
 	await scanner.start();
@@ -131,18 +139,28 @@ export abstract class TestBot extends Board {
 		dst: sdk.sourceDestination.BlockDevice,
 		src: Stream.Readable,
 	) {
-		const sdkSource = new sdk.sourceDestination.SingleUseStreamSource(src);
+		const filePath = `/tmp/img.img`;
+		console.log(`Piping stream to file`);
+		await pipeline(src, fs.createWriteStream(filePath)).catch((e) => {
+			console.log(`Error piping image to file: ${e}`);
+		});
 
-		const result = await sdk.multiWrite.pipeSourceToDestinations(
-			sdkSource,
-			// @ts-ignore
-			[dst],
-			(_: any, error: Error) => this.log(`Failure during flashing: ${error}`),
-			(progress: sdk.multiWrite.MultiDestinationProgress) => {
+		const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.File(
+			{
+				path: filePath,
+			},
+		);
+		const innerSource = await sdkSource.getInnerSource();
+		const result = await sdk.multiWrite.pipeSourceToDestinations({
+			source: innerSource,
+			destinations: [dst],
+			onFail: (_: any, error: Error) =>
+				this.log(`Failure during flashing: ${error}`),
+			onProgress: (progress: sdk.multiWrite.MultiDestinationProgress) => {
 				this.emit('progress', progress);
 			},
-			true,
-		);
+			verify: true,
+		});
 		if (result.failures.size > 0) {
 			const errorsMessage = new Array(...result.failures.values())
 				.map((e) => e.message)

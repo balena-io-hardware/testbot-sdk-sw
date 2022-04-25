@@ -1,0 +1,29 @@
+From ef3cd77970307fb9d7deb1419cdde0d575b1a866 Mon Sep 17 00:00:00 2001
+From: Alexandru Costache <alexandru@balena.io>
+Date: Tue, 19 Apr 2022 14:34:43 +0300
+Subject: [PATCH] base: Update args
+
+---
+ lib/base.ts | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/base.ts b/lib/base.ts
+index 8e998f1..dd8e090 100644
+--- a/lib/base.ts
++++ b/lib/base.ts
+@@ -25,7 +25,11 @@ async function getDrive(
+ 	device: string,
+ ): Promise<sdk.sourceDestination.BlockDevice> {
+ 	// Do not include system drives in our search
+-	const adapter = new BlockDeviceAdapter({ includeSystemDrives: () => false });
++	const adapter = new BlockDeviceAdapter({
++		includeSystemDrives: () => false,
++		write: true,
++		direct: true,
++	});
+ 	const scanner = new sdk.scanner.Scanner([adapter]);
+ 
+ 	await scanner.start();
+-- 
+2.17.1
+

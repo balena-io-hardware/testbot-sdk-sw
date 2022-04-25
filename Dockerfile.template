@@ -1,6 +1,7 @@
 # This dockerfile is used to build an image that can be used to run e2e testbot test as a balena application.
 
 FROM balenalib/%%BALENA_MACHINE_NAME%%-node:12-build as build
+RUN apt-get update && apt-get install libusb-1.0-0-dev libudev-dev
 WORKDIR /usr/src/app
 
 COPY package* ./
@@ -19,6 +20,7 @@ RUN npm run build
 # --- Result image ---
 
 FROM balenalib/%%BALENA_MACHINE_NAME%%-node:12-run as result
+RUN apt-get update && apt-get install -y libusb-1.0-0-dev libudev-dev uhubctl
 WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/node_modules ./node_modules
