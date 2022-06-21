@@ -425,6 +425,12 @@ export class BalenaFinV09 extends BalenaFin {
  */
 export class RevPiCore3 extends BalenaFinV09 {}
 
+/** Implementation for Revolution Pi Connect
+ * @remark
+ * This is also similar to the Balena Fin
+ */
+export class RevPiConnect extends BalenaFinV09 {}
+
 /** Implementation for 243390-Rpi3
  */
 export class Rpi243390 extends DeviceInteractor {

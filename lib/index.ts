@@ -13,6 +13,7 @@ import {
 	JetsonNano,
 	Rockpi4bRk3399,
 	Rpi243390,
+	RevPiConnect,
 } from './devices';
 
 export {
@@ -30,4 +31,5 @@ export {
 	JetsonNano,
 	Rockpi4bRk3399,
 	Rpi243390,
+	RevPiConnect,
 };
