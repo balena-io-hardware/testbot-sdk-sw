@@ -13,6 +13,7 @@ import {
 	JetsonNano,
 	Rockpi4bRk3399,
 	Rpi243390,
+	RevPiConnect,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -41,6 +42,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'revpi-core-3': {
 			return {
 				deviceType: 'revpi-core-3',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'revpi-connect': {
+			return {
+				deviceType: 'revpi-connect',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -160,6 +167,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'revpi-core-3': {
 			return new RevPiCore3(testbotHat);
+		}
+		case 'revpi-conect': {
+			return new RevPiConnect(testbotHat);
 		}
 		case 'raspberrypicm4-ioboard': {
 			return new CM4IOBoard(testbotHat);
