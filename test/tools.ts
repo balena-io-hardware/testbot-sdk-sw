@@ -168,7 +168,7 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		case 'revpi-core-3': {
 			return new RevPiCore3(testbotHat);
 		}
-		case 'revpi-conect': {
+		case 'revpi-connect': {
 			return new RevPiConnect(testbotHat);
 		}
 		case 'raspberrypicm4-ioboard': {
