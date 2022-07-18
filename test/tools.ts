@@ -14,6 +14,7 @@ import {
 	Rockpi4bRk3399,
 	Rpi243390,
 	RevPiConnect,
+	RtRpi300,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -78,6 +79,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'rockpi-4b-rk3399': {
 			return {
 				deviceType: 'rockpi-4b-rk3399',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'rt-rpi-300': {
+			return {
+				deviceType: 'rt-rpi-300',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -188,6 +195,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case '243390-rpi3': {
 			return new Rpi243390(testbotHat);
+		}
+		case 'rt-rpi-300': {
+			return new RtRpi300(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);

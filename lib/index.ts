@@ -14,6 +14,7 @@ import {
 	Rockpi4bRk3399,
 	Rpi243390,
 	RevPiConnect,
+	RtRpi300,
 } from './devices';
 
 export {
@@ -32,4 +33,5 @@ export {
 	Rockpi4bRk3399,
 	Rpi243390,
 	RevPiConnect,
+	RtRpi300,
 };
