@@ -196,9 +196,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		case '243390-rpi3': {
 			return new Rpi243390(testbotHat);
 		}
-                case 'rt-rpi-300': {
-                        return new RtRpi300(testbotHat);
-                }
+		case 'rt-rpi-300': {
+			return new RtRpi300(testbotHat);
+		}
 		default: {
 			return new RaspberryPi(testbotHat);
 		}
