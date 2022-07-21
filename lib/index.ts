@@ -15,6 +15,7 @@ import {
 	Rpi243390,
 	RevPiConnect,
 	RtRpi300,
+	RPI3Neuron,
 } from './devices';
 
 export {
@@ -34,4 +35,5 @@ export {
 	Rpi243390,
 	RevPiConnect,
 	RtRpi300,
+	RPI3Neuron,
 };
