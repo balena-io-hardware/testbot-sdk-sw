@@ -15,6 +15,7 @@ import {
 	Rpi243390,
 	RevPiConnect,
 	RtRpi300,
+	RPI3Neuron,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -85,6 +86,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'rt-rpi-300': {
 			return {
 				deviceType: 'rt-rpi-300',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'raspberrypi3-unipi-neuron': {
+			return {
+				deviceType: 'raspberrypi3-unipi-neuron',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -198,6 +205,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'rt-rpi-300': {
 			return new RtRpi300(testbotHat);
+		}
+		case 'raspberrypi3-unipi-neuron': {
+			return new RPI3Neuron(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);
