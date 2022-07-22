@@ -16,6 +16,7 @@ import {
 	RevPiConnect,
 	RtRpi300,
 	RPI3Neuron,
+	JetsonTX2,
 } from './devices';
 
 export {
@@ -36,4 +37,5 @@ export {
 	RevPiConnect,
 	RtRpi300,
 	RPI3Neuron,
+	JetsonTX2,
 };

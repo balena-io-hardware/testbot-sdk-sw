@@ -9,6 +9,10 @@ import { exec } from 'mz/child_process';
 
 const POLL_INTERVAL = 1000; // 1 second
 const POLL_TRIES = 20; // 20 tries
+const HIGH = 1;
+const OE_TXB = 13;
+const OE_TXS = 15;
+
 // import * as retry from 'bluebird-retry';
 
 /**
@@ -287,6 +291,117 @@ export class Rockpi4bRk3399 extends FlasherDeviceInteractor {
 export class CoralDevBoard extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
 		super(testBot, 5);
+	}
+}
+
+/** Implementation for Jetson TX2
+ * We turn on and off the TX2 using GPIO26 on the testbot header.
+ * Pin 37 on the GPIO header needs to be connected to the TX2 Devkit
+ * J6 connector pin PNL, and testbot's ground (pin 39) to TX2 Devkit
+ * J21 GND.
+ * We turn on the TX2 by simulating a .2 second button press, and
+ * turn it off by simulating an 8 second press. Regardless of the TX2
+ * state, powered on or off, the TX2 PMIC appears to forcedly power off the
+ * device when the button is pressed for 8 seconds.
+ *
+ */
+export class JetsonTX2 extends FlasherDeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
+	}
+
+	async powerOnDUT() {
+		await exec(
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 0.2 && echo in > /sys/class/gpio/gpio26/direction`,
+		).catch(() => {
+			console.log(`Failed to trigger power on sequence on Jetson TX2`);
+		});
+		console.log(`Triggered power on sequence on Jetson TX2`);
+	}
+
+	async powerOffDUT() {
+		await exec(
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 8 && echo in > /sys/class/gpio/gpio26/direction`,
+		).catch(() => {
+			console.log(`Failed to trigger power off sequence on Jetson TX2`);
+		});
+		console.log(`Triggered power off sequence on Jetson TX2`);
+	}
+
+	async enableGPIOs() {
+		await this.testBot.digitalWrite(OE_TXB, HIGH);
+		await this.testBot.digitalWrite(OE_TXS, HIGH);
+
+		await exec(`echo 26 > /sys/class/gpio/export || true`).catch(() => {
+			console.log(`Failed to export gpio for controlling TX2 power`);
+		});
+
+		await exec(`echo in > /sys/class/gpio/gpio26/direction`).catch(() => {
+			console.log(`Failed to set gpio26 as input`);
+		});
+	}
+
+	async powerOn() {
+		await this.testBot.switchSdToHost(1000);
+		await this.enableGPIOs();
+		await this.powerOffDUT();
+		/* Wait to ensure the DUT is off */
+		await Bluebird.delay(3000);
+		await this.powerOnDUT();
+	}
+
+	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
+	async waitInternalFlash() {
+		await this.powerOffDUT();
+		/* Wait to ensure the DUT is off */
+		await Bluebird.delay(3000);
+		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
+		console.log('Booting DUT with the balenaOS flasher image');
+		await this.powerOnDUT();
+
+		// check if the DUT is on first
+		let dutOn = false;
+		while (!dutOn) {
+			console.log(`waiting for DUT to be on`);
+			dutOn = await this.checkDutPower();
+			await Bluebird.delay(1000 * 5); // 5 seconds between checks
+		}
+		// once we confirmed the DUT is on, we wait for it to power down again, which signals the flashing has finished
+		// wait initially for 60s and then every 10s before checking if the board performed a shutdown after flashing the internal storage
+		await Bluebird.delay(1000 * 60);
+		while (dutOn) {
+			await Bluebird.delay(1000 * 10); // 10 seconds between checks
+			console.log(`waiting for DUT to be off`);
+			dutOn = await this.checkDutPower();
+			// occasionally the DUT might appear to be powered down, but it isn't - we want to confirm that the DUT has stayed off for an interval of time
+			if (!dutOn) {
+				let offCount = 0;
+				console.log(`detected DUT has powered off - confirming...`);
+				for (let tries = 0; tries < POLL_TRIES; tries++) {
+					await Bluebird.delay(POLL_INTERVAL);
+					dutOn = await this.checkDutPower();
+					if (!dutOn) {
+						offCount += 1;
+					}
+				}
+				console.log(
+					`DUT stayted off for ${offCount} checks, expected: ${POLL_TRIES}`,
+				);
+				if (offCount !== POLL_TRIES) {
+					// if the DUT didn't stay off, then we must try the loop again
+					dutOn = true;
+				}
+			}
+		}
+
+		if (dutOn) {
+			throw new Error('Timed out while waiting for DUT to flash');
+		} else {
+			console.log('Internally flashed - powering off DUT');
+			// power off and toggle mux.
+			await this.powerOffDUT();
+			await this.testBot.switchSdToHost(1000);
+		}
 	}
 }
 
