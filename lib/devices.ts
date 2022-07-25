@@ -10,6 +10,7 @@ import { exec } from 'mz/child_process';
 const POLL_INTERVAL = 1000; // 1 second
 const POLL_TRIES = 20; // 20 tries
 const HIGH = 1;
+const LOW = 0;
 const OE_TXB = 13;
 const OE_TXS = 15;
 
@@ -295,14 +296,14 @@ export class CoralDevBoard extends FlasherDeviceInteractor {
 }
 
 /** Implementation for Jetson TX2
- * We turn on and off the TX2 using GPIO26 on the testbot header.
- * Pin 37 on the GPIO header needs to be connected to the TX2 Devkit
- * J6 connector pin PNL, and testbot's ground (pin 39) to TX2 Devkit
- * J21 GND.
+ * We turn on and off the TX2 using GPIO26 on the testbot HAT,
+ * connected to a CD4066 switch.
+ * CD4066 pins 1,2 connect to the TX2 JP6, VSS to HAT GND, VDD
+ * to HAT 3v3 and CONTROL A to HAT gpio 26.
  * We turn on the TX2 by simulating a .2 second button press, and
- * turn it off by simulating an 8 second press. Regardless of the TX2
- * state, powered on or off, the TX2 PMIC appears to forcedly power off the
- * device when the button is pressed for 8 seconds.
+ * turn it off by simulating an 8 second one. Regardless of the TX2
+ * state - on or off - the TX2 PMIC will forcedly power off the
+ * device when JP6 PWR and PNL are connected.
  *
  */
 export class JetsonTX2 extends FlasherDeviceInteractor {
@@ -310,28 +311,10 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		super(testBot, 5);
 	}
 
-	async powerOnDUT() {
-		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 0.2 && echo in > /sys/class/gpio/gpio26/direction`,
-		).catch(() => {
-			console.log(`Failed to trigger power on sequence on Jetson TX2`);
-		});
-		console.log(`Triggered power on sequence on Jetson TX2`);
-	}
-
-	async powerOffDUT() {
-		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 8 && echo in > /sys/class/gpio/gpio26/direction`,
-		).catch(() => {
-			console.log(`Failed to trigger power off sequence on Jetson TX2`);
-		});
-		console.log(`Triggered power off sequence on Jetson TX2`);
-	}
-
 	async enableGPIOs() {
 		await this.testBot.digitalWrite(OE_TXB, HIGH);
 		await this.testBot.digitalWrite(OE_TXS, HIGH);
-
+		await Bluebird.delay(1000);
 		await exec(`echo 26 > /sys/class/gpio/export || true`).catch(() => {
 			console.log(`Failed to export gpio for controlling TX2 power`);
 		});
@@ -341,11 +324,38 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		});
 	}
 
+	async disableGPIOs() {
+		await this.testBot.digitalWrite(OE_TXB, LOW);
+		await this.testBot.digitalWrite(OE_TXS, LOW);
+		await Bluebird.delay(1000);
+	}
+
+	async powerOnDUT() {
+		this.enableGPIOs();
+		await exec(
+			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 0.2 && echo 0 > /sys/class/gpio/gpio26/value`,
+		).catch(() => {
+			console.log(`Failed to trigger power on sequence on Jetson TX2`);
+		});
+		await Bluebird.delay(3000);
+		console.log(`Triggered power on sequence on Jetson TX2`);
+	}
+
+	async powerOffDUT() {
+		this.enableGPIOs();
+		await exec(
+			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 8 && echo 0 > /sys/class/gpio/gpio26/value`,
+		).catch(() => {
+			console.log(`Failed to trigger power off sequence on Jetson TX2`);
+		});
+		await Bluebird.delay(10000);
+		console.log(`Triggered power off sequence on Jetson TX2`);
+		this.disableGPIOs();
+	}
+
 	async powerOn() {
 		await this.testBot.switchSdToHost(1000);
-		await this.enableGPIOs();
-		await this.powerOffDUT();
-		/* Wait to ensure the DUT is off */
+		/* Ensure GPIOS can be set */
 		await Bluebird.delay(3000);
 		await this.powerOnDUT();
 	}
@@ -353,8 +363,6 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
 		await this.powerOffDUT();
-		/* Wait to ensure the DUT is off */
-		await Bluebird.delay(3000);
 		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		console.log('Booting DUT with the balenaOS flasher image');
 		await this.powerOnDUT();
