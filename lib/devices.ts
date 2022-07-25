@@ -312,7 +312,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	}
 
 	async enableGPIOs() {
-		await Bluebird.delay(1000 * 5);
+		await Bluebird.delay(1000);
 		await exec(`echo 26 > /sys/class/gpio/export || true`).catch(() => {
 			console.log(`Failed to export gpio for controlling TX2 power`);
 		});
@@ -324,14 +324,14 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		});
 		await this.testBot.digitalWrite(OE_TXB, HIGH);
 		await this.testBot.digitalWrite(OE_TXS, HIGH);
-		await Bluebird.delay(1000 * 5);
+		await Bluebird.delay(1000);
 	}
 
 	async disableGPIOs() {
-		await Bluebird.delay(1000 * 5);
+		await Bluebird.delay(1000);
 		await this.testBot.digitalWrite(OE_TXB, LOW);
 		await this.testBot.digitalWrite(OE_TXS, LOW);
-		await Bluebird.delay(1000 * 5);
+		await Bluebird.delay(1000);
 	}
 
 	async powerOnDUT() {
@@ -341,8 +341,9 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		).catch(() => {
 			console.log(`Failed to trigger power on sequence on Jetson TX2`);
 		});
-		await Bluebird.delay(1000 * 5);
+		await Bluebird.delay(1000);
 		console.log(`Triggered power on sequence on Jetson TX2`);
+		this.disableGPIOs();
 	}
 
 	async powerOffDUT() {
@@ -352,7 +353,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		).catch(() => {
 			console.log(`Failed to trigger power off sequence on Jetson TX2`);
 		});
-		await Bluebird.delay(1000 * 5);
+		await Bluebird.delay(1000);
 		console.log(`Triggered power off sequence on Jetson TX2`);
 		this.disableGPIOs();
 	}
@@ -364,10 +365,9 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
-		await this.powerOffDUT();
 		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		console.log('Booting TX2 with the balenaOS flasher image');
-		await Bluebird.delay(1000 * 5);
+		await Bluebird.delay(1000);
 		await this.powerOnDUT();
 
 		// check if the DUT is on first
