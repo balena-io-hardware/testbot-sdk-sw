@@ -298,8 +298,9 @@ export class CoralDevBoard extends FlasherDeviceInteractor {
 /** Implementation for Jetson TX2
  * We turn on and off the TX2 using GPIO26 on the testbot HAT,
  * connected to a CD4066 switch.
- * CD4066 pins 1,2 connect to the TX2 JP6, VSS to HAT GND, VDD
- * to HAT 3v3 and CONTROL A to HAT gpio 26.
+ * CD4066 pins 1,2 connect to the TX2 JP6, VSS,HAT GND and TX2 GND are connected together, VDD
+ * to HAT 3v3 and CONTROL A to HAT gpio 26. A 10K resistor is also needed
+ * between VSS and 4066 GND.
  * We turn on the TX2 by simulating a .2 second button press, and
  * turn it off by simulating an 8 second one. Regardless of the TX2
  * state - on or off - the TX2 PMIC will forcedly power off the
@@ -312,32 +313,32 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	}
 
 	async enableGPIOs() {
-		await Bluebird.delay(1000);
+		await Bluebird.delay(100);
+		await this.testBot.digitalWrite(OE_TXB, HIGH);
+		await this.testBot.digitalWrite(OE_TXS, HIGH);
+		await Bluebird.delay(100);
 		await exec(`echo 26 > /sys/class/gpio/export || true`).catch(() => {
 			console.log(`Failed to export gpio for controlling TX2 power`);
 		});
-
 		await exec(
 			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to set gpio26 as input`);
 		});
-		await this.testBot.digitalWrite(OE_TXB, HIGH);
-		await this.testBot.digitalWrite(OE_TXS, HIGH);
-		await Bluebird.delay(1000);
+		await Bluebird.delay(500);
 	}
 
 	async disableGPIOs() {
-		await Bluebird.delay(1000);
+		await Bluebird.delay(100);
 		await this.testBot.digitalWrite(OE_TXB, LOW);
 		await this.testBot.digitalWrite(OE_TXS, LOW);
-		await Bluebird.delay(1000);
+		await Bluebird.delay(100);
 	}
 
 	async powerOnDUT() {
 		this.enableGPIOs();
 		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 0.2 && echo 0 > /sys/class/gpio/gpio26/value`,
+			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 0.5 && echo 0 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to trigger power on sequence on Jetson TX2`);
 		});
@@ -348,12 +349,14 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 
 	async powerOffDUT() {
 		this.enableGPIOs();
+		/* Forcedly power off device, even if it is on */
 		await exec(
 			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 8 && echo 0 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to trigger power off sequence on Jetson TX2`);
 		});
-		await Bluebird.delay(1000);
+		/* Ensure device is off */
+		await Bluebird.delay(10000);
 		console.log(`Triggered power off sequence on Jetson TX2`);
 		this.disableGPIOs();
 	}
@@ -367,13 +370,12 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	async waitInternalFlash() {
 		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		console.log('Booting TX2 with the balenaOS flasher image');
-		await Bluebird.delay(1000);
 		await this.powerOnDUT();
 
 		// check if the DUT is on first
 		let dutOn = false;
 		while (!dutOn) {
-			console.log(`waiting for TX2 to be on`);
+			console.log(`Waiting for TX2 to be on`);
 			dutOn = await this.checkDutPower();
 			await Bluebird.delay(1000 * 5); // 5 seconds between checks
 		}
