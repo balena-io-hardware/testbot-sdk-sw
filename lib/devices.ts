@@ -313,6 +313,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	}
 
 	async enableGPIOs() {
+		console.log('enableGPIOs enter');
 		await Bluebird.delay(100);
 		await this.testBot.digitalWrite(OE_TXB, HIGH);
 		await this.testBot.digitalWrite(OE_TXS, HIGH);
@@ -326,19 +327,20 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			console.log(`Failed to set gpio26 as input`);
 		});
 		await Bluebird.delay(500);
+		console.log('enableGPIOs leave');
 	}
 
 	async disableGPIOs() {
-		console.log('Will leave GPIOs on ' + LOW);
-		/*
+		console.log('disableGPIOs enter');
 		await Bluebird.delay(100);
 		await this.testBot.digitalWrite(OE_TXB, LOW);
 		await this.testBot.digitalWrite(OE_TXS, LOW);
 		await Bluebird.delay(100);
-		*/
+		console.log('disableGPIOs leave');
 	}
 
 	async powerOnDUT() {
+		console.log('powerOnDUT - TX2 enter');
 		this.enableGPIOs();
 		await exec(
 			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 0.5 && echo 0 > /sys/class/gpio/gpio26/value`,
@@ -348,9 +350,11 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await Bluebird.delay(1000);
 		console.log(`Triggered power on sequence on Jetson TX2`);
 		this.disableGPIOs();
+		console.log('powerOnDUT - TX2 leave');
 	}
 
 	async powerOffDUT() {
+		console.log('powerOffDUT - TX2 enter');
 		this.enableGPIOs();
 		/* Forcedly power off device, even if it is on */
 		await exec(
@@ -362,6 +366,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await Bluebird.delay(10000);
 		console.log(`Triggered power off sequence on Jetson TX2`);
 		this.disableGPIOs();
+		console.log('powerOffDUT - TX2 leave');
 	}
 
 	async powerOn() {
@@ -369,11 +374,23 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await this.powerOnDUT();
 	}
 
+	async powerOff() {
+		console.log(`powerOff - Will turn off TX2`);
+		const dutIsOn = await this.checkDutPower();
+		if (dutIsOn) {
+			console.log('TX2 is booted, trigger normal shutdown');
+			await this.powerOnDUT();
+		} else {
+			console.log('TX2 is not booted, trigger force shutdown');
+			await this.powerOffDUT();
+		}
+	}
+
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
-		console.log(`Will turn off DUT`);
+		console.log(`Will turn off TX2`);
 		await this.powerOffDUT();
-		console.log(`Triggered power off of DUT`);
+		console.log(`Triggered power off of TX2`);
 		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		console.log('Booting TX2 with the balenaOS flasher image');
 		await this.powerOnDUT();
