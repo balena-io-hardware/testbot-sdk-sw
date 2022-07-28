@@ -314,10 +314,10 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 
 	async enableGPIOs() {
 		console.log('enableGPIOs enter');
-		await Bluebird.delay(100);
+		await Bluebird.delay(500);
 		await this.testBot.digitalWrite(OE_TXB, HIGH);
 		await this.testBot.digitalWrite(OE_TXS, HIGH);
-		await Bluebird.delay(100);
+		await Bluebird.delay(500);
 		await exec(`echo 26 > /sys/class/gpio/export || true`).catch(() => {
 			console.log(`Failed to export gpio for controlling TX2 power`);
 		});
@@ -370,7 +370,10 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	}
 
 	async powerOn() {
+		console.log(`powerOn - tx2`);
 		await this.testBot.switchSdToHost(1000);
+		/* Wait to ensure SD is disabled */
+		await Bluebird.delay(3000);
 		await this.powerOnDUT();
 	}
 
@@ -433,9 +436,9 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		if (dutOn) {
 			throw new Error('Timed out while waiting for DUT to flash');
 		} else {
-			console.log('Internally flashed - powering off DUT');
+			console.log('Internally flashed - switching SD to Host');
 			// power off and toggle mux.
-			await this.powerOffDUT();
+			// await this.powerOffDUT();
 			await this.testBot.switchSdToHost(1000);
 		}
 	}
