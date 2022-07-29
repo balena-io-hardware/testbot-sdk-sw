@@ -313,7 +313,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	}
 
 	async enableGPIOs() {
-		console.log('enableGPIOs enter');
+		// console.log('enableGPIOs enter');
 		await Bluebird.delay(500);
 		await this.testBot.digitalWrite(OE_TXB, HIGH);
 		await this.testBot.digitalWrite(OE_TXS, HIGH);
@@ -327,16 +327,16 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			console.log(`Failed to set gpio26 as input`);
 		});
 		await Bluebird.delay(500);
-		console.log('enableGPIOs leave');
+		// console.log('enableGPIOs leave');
 	}
 
 	async disableGPIOs() {
-		console.log('disableGPIOs enter');
-		await Bluebird.delay(100);
+		// console.log('disableGPIOs enter');
+		await Bluebird.delay(500);
 		await this.testBot.digitalWrite(OE_TXB, LOW);
 		await this.testBot.digitalWrite(OE_TXS, LOW);
-		await Bluebird.delay(100);
-		console.log('disableGPIOs leave');
+		await Bluebird.delay(500);
+		// console.log('disable GPIOs leave');
 	}
 
 	async powerOnDUT() {
@@ -364,17 +364,17 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		});
 		/* Ensure device is off */
 		await Bluebird.delay(10000);
-		console.log(`Triggered power off sequence on Jetson TX2`);
 		this.disableGPIOs();
 		console.log('powerOffDUT - TX2 leave');
 	}
 
 	async powerOn() {
-		console.log(`powerOn - tx2`);
+		console.log(`powerOn - tx2 enter`);
 		await this.testBot.switchSdToHost(1000);
 		/* Wait to ensure SD is disabled */
 		await Bluebird.delay(3000);
 		await this.powerOnDUT();
+		console.log(`powerOn - tx2 leave`);
 	}
 
 	async powerOff() {
@@ -437,9 +437,8 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			throw new Error('Timed out while waiting for DUT to flash');
 		} else {
 			console.log('Internally flashed - switching SD to Host');
-			// power off and toggle mux.
-			// await this.powerOffDUT();
 			await this.testBot.switchSdToHost(1000);
+			await Bluebird.delay(1000 * 5);
 		}
 	}
 }
