@@ -392,9 +392,9 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
 		console.log(`Will turn off TX2`);
-		await this.powerOffDUT();
+		await this.powerOff();
 		console.log(`Triggered power off of TX2`);
-		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
+		await this.testBot.switchSdToDUT(15000); // Wait for 15s after toggling mux (test), to ensure that the mux is toggled to DUT before powering it on
 		console.log('Booting TX2 with the balenaOS flasher image');
 		await this.powerOnDUT();
 
