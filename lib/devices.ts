@@ -387,13 +387,27 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			console.log('TX2 is not booted, trigger force shutdown');
 			await this.powerOffDUT();
 		}
+		let dutOn = true;
+		while (dutOn) {
+			console.log(`Waiting for TX2 to be off`);
+			dutOn = await this.checkDutPower();
+			await Bluebird.delay(1000 * 5); // 5 seconds between checks
+		}
+		console.log(`powerOff - TX2 is now powered off`);
+	}
+
+	async flash(stream: Stream.Readable) {
+		console.log(`flash - Will turn off TX2`);
+		await this.powerOff();
+		// first flash the external media
+		console.log(`Powered off TX2, will write image to SD-CARD`);
+		await this.testBot.flash(stream);
+		// wait for the DUT to self-shutdown after balenaOS flasher finishes provisiong the internal media
+		await this.waitInternalFlash();
 	}
 
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
-		console.log(`Will turn off TX2`);
-		await this.powerOff();
-		console.log(`Triggered power off of TX2`);
 		await this.testBot.switchSdToDUT(15000); // Wait for 15s after toggling mux (test), to ensure that the mux is toggled to DUT before powering it on
 		console.log('Booting TX2 with the balenaOS flasher image');
 		await this.powerOnDUT();

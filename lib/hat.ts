@@ -108,9 +108,12 @@ export class TestBotHat extends TestBot {
 		// We need to send an active-low signal, at least 1us wide.
 		this.log('Start resetting the hub');
 		await this.digitalWrite(TestBotHat.PINS.SD_RESET_N, 0);
-
+		await new Promise((resolve) => setTimeout(resolve, 10000));
+		console.log(`Set reset pin to low`);
 		// Await calls here take at least a dozen of ms to complete. So, no extra delays are neeed.
 		await this.digitalWrite(TestBotHat.PINS.SD_RESET_N, 1);
+		await new Promise((resolve) => setTimeout(resolve, 10000));
+		console.log(`Set reset pin to high`);
 		this.log('Completed resetting the hub');
 	}
 
