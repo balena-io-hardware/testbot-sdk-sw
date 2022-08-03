@@ -1,4 +1,3 @@
-import * as Bluebird from 'bluebird';
 import * as Stream from 'stream';
 import * as SerialPort from 'serialport';
 import { Logger, TestBot } from './base';
@@ -63,6 +62,11 @@ export class TestBotHat extends TestBot {
 		]);
 	}
 
+	public async printTimestamp(msg: string) {
+		const tstamp = new Date();
+		console.log(tstamp + ` > ${msg}`);
+	}
+
 	/**
 	 *  Method to setup HAT's firmata connection and ready the testbot for testing
 	 */
@@ -106,35 +110,37 @@ export class TestBotHat extends TestBot {
 	/** Reset SD mux hub. It takes the mux at most 500us to recover. */
 	private async resetHub() {
 		// We need to send an active-low signal, at least 1us wide.
-		this.log('Start resetting the hub');
-		await this.digitalWrite(TestBotHat.PINS.SD_RESET_N, 0);
-		await new Promise((resolve) => setTimeout(resolve, 10000));
+		await this.printTimestamp('resetHub() - Start resetting the hub');
 		console.log(`Set reset pin to low`);
 		// Await calls here take at least a dozen of ms to complete. So, no extra delays are neeed.
 		await this.digitalWrite(TestBotHat.PINS.SD_RESET_N, 1);
-		await new Promise((resolve) => setTimeout(resolve, 10000));
+		await new Promise((resolve) => setTimeout(resolve, 10));
 		console.log(`Set reset pin to high`);
-		this.log('Completed resetting the hub');
+		await this.printTimestamp('resetHub() - Completed resetting the hub');
 	}
 
 	/**
 	 *  Switches SD card control to the DUT
 	 */
 	public async switchSdToDUT(settle: number = 0) {
-		this.log('Switching SD card to device...');
+		await this.printTimestamp(`switchSdToDUT() - enter`);
 		await this.digitalWrite(TestBotHat.PINS.SD_MUX_SEL_PIN, this.LOW);
 		await this.resetHub();
-		await Bluebird.delay(settle);
+		// await Bluebird.delay(settle);
+		await new Promise((resolve) => setTimeout(resolve, settle));
+		await this.printTimestamp(`switchSdToDUT() - leave`);
 	}
 
 	/**
 	 *  Switches SD card control to the host (Testbot)
 	 */
 	public async switchSdToHost(settle: number = 0) {
-		this.log('Switching SD card to host...');
+		await this.printTimestamp(`switchSdToHost() - enter`);
 		await this.digitalWrite(TestBotHat.PINS.SD_MUX_SEL_PIN, this.HIGH);
 		await this.resetHub();
-		await Bluebird.delay(settle);
+		// await Bluebird.delay(settle);
+		await new Promise((resolve) => setTimeout(resolve, settle));
+		await this.printTimestamp(`switchSdToHost() - leave`);
 	}
 
 	/**

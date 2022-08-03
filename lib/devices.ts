@@ -312,49 +312,75 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		super(testBot, 5);
 	}
 
+	public async printTimestamp(msg: string) {
+		const tstamp = new Date();
+		console.log(tstamp + ` > ${msg}`);
+	}
+
+	public async checkDutPower() {
+		await this.enableGPIOs();
+		const [stdout, stderr] = await exec(`cat /sys/class/gpio/gpio13/value`);
+		console.log(stderr);
+		const file = stdout.toString();
+		await this.disableGPIOs();
+		if (file.includes('1')) {
+			await this.printTimestamp(`checkDutPower() - DUT is currently On`);
+			return true;
+		} else {
+			await this.printTimestamp(`checkDutPower() - DUT is currently Off`);
+			return false;
+		}
+	}
+
 	async enableGPIOs() {
 		// console.log('enableGPIOs enter');
-		await Bluebird.delay(500);
+		await this.printTimestamp(`enableGPIOs() - enter`);
 		await this.testBot.digitalWrite(OE_TXB, HIGH);
 		await this.testBot.digitalWrite(OE_TXS, HIGH);
-		await Bluebird.delay(500);
+		await new Promise((resolve) => setTimeout(resolve, 100));
 		await exec(`echo 26 > /sys/class/gpio/export || true`).catch(() => {
 			console.log(`Failed to export gpio for controlling TX2 power`);
 		});
 		await exec(
 			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
-			console.log(`Failed to set gpio26 as input`);
+			console.log(`Failed to set gpio26 as output`);
 		});
-		await Bluebird.delay(500);
-		// console.log('enableGPIOs leave');
+
+		await exec(`echo 13 > /sys/class/gpio/export || true`).catch(() => {
+			console.log(`Failed to export gpio for checking TX2 power`);
+		});
+		await exec(`echo in > /sys/class/gpio/gpio13/direction`).catch(() => {
+			console.log(`Failed to set gpio13 as input`);
+		});
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		await this.printTimestamp(`enableGPIOs() - leave`);
 	}
 
 	async disableGPIOs() {
-		// console.log('disableGPIOs enter');
-		await Bluebird.delay(500);
+		await this.printTimestamp(`disableGPIOs() - enter`);
+		await new Promise((resolve) => setTimeout(resolve, 50));
 		await this.testBot.digitalWrite(OE_TXB, LOW);
 		await this.testBot.digitalWrite(OE_TXS, LOW);
-		await Bluebird.delay(500);
-		// console.log('disable GPIOs leave');
+		await new Promise((resolve) => setTimeout(resolve, 50));
+		await this.printTimestamp(`disableGPIOs() - leave`);
 	}
 
 	async powerOnDUT() {
-		console.log('powerOnDUT - TX2 enter');
+		await this.printTimestamp('powerOnDUT() - TX2 enter');
 		this.enableGPIOs();
 		await exec(
 			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 0.5 && echo 0 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to trigger power on sequence on Jetson TX2`);
 		});
-		await Bluebird.delay(1000);
-		console.log(`Triggered power on sequence on Jetson TX2`);
+		await new Promise((resolve) => setTimeout(resolve, 500));
 		this.disableGPIOs();
-		console.log('powerOnDUT - TX2 leave');
+		await this.printTimestamp('powerOnDUT() - TX2 leave');
 	}
 
 	async powerOffDUT() {
-		console.log('powerOffDUT - TX2 enter');
+		await this.printTimestamp('powerOffDUT() - TX2 enter');
 		this.enableGPIOs();
 		/* Forcedly power off device, even if it is on */
 		await exec(
@@ -363,59 +389,69 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			console.log(`Failed to trigger power off sequence on Jetson TX2`);
 		});
 		/* Ensure device is off */
-		await Bluebird.delay(10000);
+		await new Promise((resolve) => setTimeout(resolve, 500));
+		await this.printTimestamp(
+			'powerOffDUT() - waited for the device to forcedly shutdown',
+		);
 		this.disableGPIOs();
-		console.log('powerOffDUT - TX2 leave');
+		await this.printTimestamp('powerOffDUT - TX2 leave');
 	}
 
 	async powerOn() {
-		console.log(`powerOn - tx2 enter`);
-		await this.testBot.switchSdToHost(1000);
+		await this.printTimestamp(`powerOn() - TX2 enter`);
+		await this.testBot.switchSdToHost(500);
 		/* Wait to ensure SD is disabled */
-		await Bluebird.delay(3000);
 		await this.powerOnDUT();
-		console.log(`powerOn - tx2 leave`);
+		await this.printTimestamp(`powerOn() - tx2 leave`);
 	}
 
 	async powerOff() {
-		console.log(`powerOff - Will turn off TX2`);
-		const dutIsOn = await this.checkDutPower();
+		await this.printTimestamp(`powerOff() - TX2 enter`);
+		let dutIsOn = await this.checkDutPower();
 		if (dutIsOn) {
-			console.log('TX2 is booted, trigger normal shutdown');
+			await this.printTimestamp(
+				'powerOff() - TX2 is booted, trigger normal shutdown',
+			);
 			await this.powerOnDUT();
+			while (dutIsOn) {
+				await this.printTimestamp(`powerOff() - Waiting for TX2 to be off`);
+				dutIsOn = await this.checkDutPower();
+				await Bluebird.delay(1000 * 5); // 5 seconds between checks
+			}
 		} else {
-			console.log('TX2 is not booted, trigger force shutdown');
-			await this.powerOffDUT();
+			await this.printTimestamp(
+				'powerOff() - TX2 is off, no need to do anything',
+			);
 		}
-		let dutOn = true;
-		while (dutOn) {
-			console.log(`Waiting for TX2 to be off`);
-			dutOn = await this.checkDutPower();
-			await Bluebird.delay(1000 * 5); // 5 seconds between checks
-		}
-		console.log(`powerOff - TX2 is now powered off`);
+
+		await this.printTimestamp(`powerOff() - TX2 is now powered off`);
 	}
 
 	async flash(stream: Stream.Readable) {
-		console.log(`flash - Will turn off TX2`);
+		await this.printTimestamp(`flash() - enter`);
 		await this.powerOff();
 		// first flash the external media
 		console.log(`Powered off TX2, will write image to SD-CARD`);
 		await this.testBot.flash(stream);
 		// wait for the DUT to self-shutdown after balenaOS flasher finishes provisiong the internal media
 		await this.waitInternalFlash();
+		await this.printTimestamp(`flash() - leave`);
 	}
 
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
-		await this.testBot.switchSdToDUT(15000); // Wait for 15s after toggling mux (test), to ensure that the mux is toggled to DUT before powering it on
-		console.log('Booting TX2 with the balenaOS flasher image');
+		await this.testBot.switchSdToDUT(500); // Wait for 5s after toggling mux (test), to ensure that the mux is toggled to DUT before powering it on
+		await this.printTimestamp(
+			'waitInternalFlash() - Booting TX2 with the balenaOS flasher image',
+		);
 		await this.powerOnDUT();
 
 		// check if the DUT is on first
 		let dutOn = false;
 		while (!dutOn) {
-			console.log(`Waiting for TX2 to be on`);
+			await this.printTimestamp(
+				`waitInternalFlash() -Checking every 5 seconds if TX2 is on`,
+			);
 			dutOn = await this.checkDutPower();
 			await Bluebird.delay(1000 * 5); // 5 seconds between checks
 		}
@@ -424,12 +460,16 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await Bluebird.delay(1000 * 60);
 		while (dutOn) {
 			await Bluebird.delay(1000 * 10); // 10 seconds between checks
-			console.log(`waiting for TX2 to be off`);
+			await this.printTimestamp(
+				`waitInternalFlash() - waiting for TX2 to be off`,
+			);
 			dutOn = await this.checkDutPower();
 			// occasionally the DUT might appear to be powered down, but it isn't - we want to confirm that the DUT has stayed off for an interval of time
 			if (!dutOn) {
 				let offCount = 0;
-				console.log(`detected DUT has powered off - confirming...`);
+				await this.printTimestamp(
+					`waitInternalFlash() - detected DUT has powered off - confirming...`,
+				);
 				for (let tries = 0; tries < POLL_TRIES; tries++) {
 					await Bluebird.delay(POLL_INTERVAL);
 					dutOn = await this.checkDutPower();
@@ -437,8 +477,8 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 						offCount += 1;
 					}
 				}
-				console.log(
-					`DUT stayted off for ${offCount} checks, expected: ${POLL_TRIES}`,
+				await this.printTimestamp(
+					`waitInternalFlash() - DUT stayted off for ${offCount} checks, expected: ${POLL_TRIES}`,
 				);
 				if (offCount !== POLL_TRIES) {
 					// if the DUT didn't stay off, then we must try the loop again
@@ -452,7 +492,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		} else {
 			console.log('Internally flashed - switching SD to Host');
 			await this.testBot.switchSdToHost(1000);
-			await Bluebird.delay(1000 * 5);
+			await new Promise((resolve) => setTimeout(resolve, 5000));
 		}
 	}
 }
