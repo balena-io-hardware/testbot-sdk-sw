@@ -358,12 +358,12 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	}
 
 	async disableGPIOs() {
-		await this.printTimestamp(`disableGPIOs() - enter`);
-		await new Promise((resolve) => setTimeout(resolve, 50));
-		await this.testBot.digitalWrite(OE_TXB, LOW);
-		await this.testBot.digitalWrite(OE_TXS, LOW);
-		await new Promise((resolve) => setTimeout(resolve, 50));
-		await this.printTimestamp(`disableGPIOs() - leave`);
+		// await this.printTimestamp(`disableGPIOs() - enter`);
+		// await new Promise((resolve) => setTimeout(resolve, 50));
+		console.log(`${OE_TXB},${OE_TXS}, ${LOW}`);
+		// await this.testBot.digitalWrite(OE_TXS, LOW);
+		// await new Promise((resolve) => setTimeout(resolve, 50));
+		// await this.printTimestamp(`disableGPIOs() - leave`);
 	}
 
 	async powerOnDUT() {
