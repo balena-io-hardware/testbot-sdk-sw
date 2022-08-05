@@ -427,17 +427,6 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await this.printTimestamp(`powerOff() - TX2 is now powered off`);
 	}
 
-	async flash(stream: Stream.Readable) {
-		await this.printTimestamp(`flash() - enter`);
-		await this.powerOff();
-		// first flash the external media
-		console.log(`Powered off TX2, will write image to SD-CARD`);
-		await this.testBot.flash(stream);
-		// wait for the DUT to self-shutdown after balenaOS flasher finishes provisiong the internal media
-		await this.waitInternalFlash();
-		await this.printTimestamp(`flash() - leave`);
-	}
-
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
 		await this.testBot.switchSdToDUT(500); // Wait for 5s after toggling mux (test), to ensure that the mux is toggled to DUT before powering it on

@@ -114,7 +114,6 @@ export class TestBotHat extends TestBot {
 		console.log(`Set reset pin to low`);
 		// Await calls here take at least a dozen of ms to complete. So, no extra delays are neeed.
 		await this.digitalWrite(TestBotHat.PINS.SD_RESET_N, 1);
-		await new Promise((resolve) => setTimeout(resolve, 10));
 		console.log(`Set reset pin to high`);
 		await this.printTimestamp('resetHub() - Completed resetting the hub');
 	}
