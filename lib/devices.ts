@@ -342,7 +342,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			console.log(`Failed to export gpio for controlling TX2 power`);
 		});
 		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value`,
+			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to set gpio26 as output`);
 		});
@@ -370,7 +370,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await this.printTimestamp('powerOnDUT() - TX2 enter');
 		this.enableGPIOs();
 		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 0.5 && echo 0 > /sys/class/gpio/gpio26/value`,
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 0.5 && echo 1 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to trigger power on sequence on Jetson TX2`);
 		});
@@ -384,7 +384,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		this.enableGPIOs();
 		/* Forcedly power off device, even if it is on */
 		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 8 && echo 0 > /sys/class/gpio/gpio26/value`,
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 8 && echo 1 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to trigger power off sequence on Jetson TX2`);
 		});
