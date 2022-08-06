@@ -16,6 +16,7 @@ import {
 	RevPiConnect,
 	RtRpi300,
 	RPI3Neuron,
+	JetsonTX2,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -92,6 +93,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'raspberrypi3-unipi-neuron': {
 			return {
 				deviceType: 'raspberrypi3-unipi-neuron',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'jetson-tx2': {
+			return {
+				deviceType: 'jetson-tx2',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -208,6 +215,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'raspberrypi3-unipi-neuron': {
 			return new RPI3Neuron(testbotHat);
+		}
+		case 'jetson-tx2': {
+			return new JetsonTX2(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);
