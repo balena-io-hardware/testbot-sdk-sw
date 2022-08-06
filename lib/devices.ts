@@ -399,6 +399,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 
 	async powerOn() {
 		await this.testBot.switchSdToHost(1000);
+		await this.testBot.setVout(this.powerVoltage);
 		await this.powerOnDUT();
 	}
 
