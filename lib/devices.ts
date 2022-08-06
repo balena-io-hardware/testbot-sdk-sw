@@ -321,11 +321,18 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			console.log(`Failed to export gpio for controlling TX2 power`);
 		});
 		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value`,
+			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
-			console.log(`Failed to set gpio26 as input`);
+			console.log(`Failed to set gpio26 as output`);
 		});
-		await Bluebird.delay(500);
+
+		await exec(`echo 13 > /sys/class/gpio/export || true`).catch(() => {
+			console.log(`Failed to export gpio for checking TX2 power`);
+		});
+		await exec(`echo in > /sys/class/gpio/gpio13/direction`).catch(() => {
+			console.log(`Failed to set gpio13 as input`);
+		});
+		await Bluebird.delay(100);
 	}
 
 	async disableGPIOs() {
@@ -338,10 +345,36 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		*/
 	}
 
+	public async checkDutPower() {
+		await this.enableGPIOs();
+		const [stdout, stderr] = await exec(`cat /sys/class/gpio/gpio13/value`);
+		console.log(stderr);
+		const file = stdout.toString();
+		await this.disableGPIOs();
+		if (file.includes('1')) {
+			console.log(`checkDutPower() - DUT is currently On`);
+			return true;
+		} else {
+			console.log(`checkDutPower() - DUT is currently Off`);
+			return false;
+		}
+	}
+
+	async powerOff() {
+		console.log(`powerOff - Will turn off TX2`);
+		const dutIsOn = await this.checkDutPower();
+		if (dutIsOn) {
+			console.log('TX2 is booted, trigger normal shutdown');
+			await this.powerOnDUT();
+		} else {
+			console.log('TX2 is not booted, no need to do anything');
+			// await this.powerOffDUT();
+		}
+	}
 	async powerOnDUT() {
 		this.enableGPIOs();
 		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 0.5 && echo 0 > /sys/class/gpio/gpio26/value`,
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 0.5 && echo 1 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to trigger power on sequence on Jetson TX2`);
 		});
@@ -354,12 +387,12 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		this.enableGPIOs();
 		/* Forcedly power off device, even if it is on */
 		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value && sleep 8 && echo 0 > /sys/class/gpio/gpio26/value`,
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 8 && echo 1 > /sys/class/gpio/gpio26/value`,
 		).catch(() => {
 			console.log(`Failed to trigger power off sequence on Jetson TX2`);
 		});
 		/* Ensure device is off */
-		await Bluebird.delay(10000);
+		await Bluebird.delay(500);
 		console.log(`Triggered power off sequence on Jetson TX2`);
 		this.disableGPIOs();
 	}
@@ -372,7 +405,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	/** Power on the DUT and wait for balenaOS to be provisioned onto internal media */
 	async waitInternalFlash() {
 		console.log(`Will turn off DUT`);
-		await this.powerOffDUT();
+		await this.powerOff();
 		console.log(`Triggered power off of DUT`);
 		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		console.log('Booting TX2 with the balenaOS flasher image');
@@ -417,8 +450,8 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 			throw new Error('Timed out while waiting for DUT to flash');
 		} else {
 			console.log('Internally flashed - powering off DUT');
-			// power off and toggle mux.
-			await this.powerOffDUT();
+			// toggle mux.
+			// await this.powerOffDUT();
 			await this.testBot.switchSdToHost(1000);
 		}
 	}
