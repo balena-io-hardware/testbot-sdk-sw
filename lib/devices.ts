@@ -9,6 +9,9 @@ import { exec } from 'mz/child_process';
 
 const POLL_INTERVAL = 1000; // 1 second
 const POLL_TRIES = 20; // 20 tries
+const HIGH = 1;
+const LOW = 0;
+
 // import * as retry from 'bluebird-retry';
 
 /**
@@ -287,6 +290,218 @@ export class Rockpi4bRk3399 extends FlasherDeviceInteractor {
 export class CoralDevBoard extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
 		super(testBot, 5);
+	}
+}
+
+/**
+ * Implementation for Jetson TX2
+ * We turn the TX2 on and off using GPIO26 on the testbot HAT, which is
+ * connected to a 5V relay. GPIO13 is connected to J21.1 (3v3) on
+ * the TX2 to determine the DUT power state.
+ */
+export class JetsonTX2 extends FlasherDeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
+	}
+	private gpiosEnabled: boolean = false;
+	PINS = {
+		DUT_PW_EN: 14,
+		OE_TXB: 13,
+		OE_TXS: 15,
+	};
+
+	async enableGPIOs() {
+		if (this.gpiosEnabled) {
+			return;
+		}
+		await this.testBot.digitalWrite(this.PINS.OE_TXB, HIGH);
+		await this.testBot.digitalWrite(this.PINS.OE_TXS, HIGH);
+		await Bluebird.delay(100);
+
+		/* Toggles the power relay */
+		await exec(`echo 26 > /sys/class/gpio/export || true`).catch(() => {
+			console.log(`Failed to export gpio for controlling TX2 power`);
+		});
+		await exec(
+			`echo out > /sys/class/gpio/gpio26/direction && echo 1 > /sys/class/gpio/gpio26/value`,
+		).catch(() => {
+			console.log(`Failed to set gpio26 as output`);
+		});
+
+		/* Used for checking if the TX2 is on or off */
+		await exec(`echo 13 > /sys/class/gpio/export || true`).catch(() => {
+			console.log(`Failed to export gpio for checking TX2 power`);
+		});
+		await exec(`echo in > /sys/class/gpio/gpio13/direction`).catch(() => {
+			console.log(`Failed to set gpio13 as input`);
+		});
+		await Bluebird.delay(100);
+		this.gpiosEnabled = true;
+	}
+
+	public async checkDutPower() {
+		await this.enableGPIOs();
+		const [stdout, stderr] = await exec(`cat /sys/class/gpio/gpio13/value`);
+		console.log(stderr);
+		const file = stdout.toString();
+
+		if (file.includes('1')) {
+			console.log(`checkDutPower() - DUT is currently On`);
+			return true;
+		} else {
+			console.log(`checkDutPower() - DUT is currently Off`);
+			return false;
+		}
+	}
+
+	async checkDutBooted() {
+		const [stdout, stderr] = await exec(`cat /sys/class/net/eth1/carrier`);
+		console.log(stderr);
+		const file = stdout.toString();
+		if (file.includes('1')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	async powerOff() {
+		console.log(`powerOff - Will turn off TX2`);
+		const dutIsOn = await this.checkDutPower();
+		if (dutIsOn) {
+			console.log('TX2 is booted, trigger normal shutdown');
+			/* Simulate short press on the power button */
+			await this.powerOnDUT();
+		} else {
+			console.log('TX2 is not booted, no power toggle needed');
+		}
+	}
+	async powerOnDUT() {
+		await this.enableGPIOs();
+		await this.powerOnRelay();
+		await Bluebird.delay(500);
+		await exec(
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 1 && echo 1 > /sys/class/gpio/gpio26/value`,
+		).catch(() => {
+			console.log(`Failed to trigger power on sequence on Jetson TX2`);
+		});
+		await Bluebird.delay(1000);
+		console.log(`Triggered power on sequence on TX2`);
+	}
+
+	/* NOTE: The 5V relay does not seem to work reliably if powered from the HAT
+	 * so we use an external source for now.
+	 */
+	async powerOnRelay() {
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.digitalWrite(this.PINS.DUT_PW_EN, HIGH);
+	}
+
+	async powerOffRelay() {
+		await this.testBot.digitalWrite(this.PINS.DUT_PW_EN, LOW);
+	}
+
+	async powerOffDUT() {
+		await this.enableGPIOs();
+		await this.powerOnRelay();
+		await Bluebird.delay(500);
+		/* Forcedly power off device, even if it is on */
+		await exec(
+			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 8 && echo 1 > /sys/class/gpio/gpio26/value`,
+		).catch(() => {
+			console.log(`Failed to trigger power off sequence on TX2`);
+		});
+
+		console.log(`Triggered power off sequence on TX2`);
+		await Bluebird.delay(1000);
+
+		/* Ensure device is off */
+		const dutIsOn = await this.checkDutPower();
+		if (dutIsOn) {
+			console.log('WARN: Triggered force shutdown but TX2 did not power off');
+		}
+		await this.powerOffRelay();
+	}
+
+	async powerOn() {
+		await this.testBot.switchSdToHost(1000);
+		await this.powerOnDUT();
+	}
+
+	/* Power on the DUT and wait for balenaOS to be provisioned onto internal media */
+	async waitInternalFlash() {
+		console.log(`Ensure TX2 is powered off`);
+		await this.powerOff();
+		let retries = 10;
+		let dutIsOn = await this.checkDutPower();
+
+		/* Leave some time for the TX2 to gracefully shut down in case it was on for any reason */
+		while (dutIsOn && --retries) {
+			await Bluebird.delay(1000 * 10); // 10 seconds between checks
+			console.log(
+				`Waiting for TX2 to be off - Will check again at most ${retries} times`,
+			);
+			dutIsOn = await this.checkDutPower();
+			if (10 === retries) {
+				throw new Error('Failed to power off the TX2 before flashing');
+			}
+		}
+
+		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
+		console.log('Booting TX2 with the balenaOS flasher image');
+		await this.powerOnDUT();
+
+		// check if the DUT is on first
+		let dutOn = false;
+		let dutBooted = false;
+
+		while (!dutOn) {
+			console.log(`Waiting for TX2 to be on`);
+			dutOn = await this.checkDutPower();
+			await Bluebird.delay(1000 * 5); // 5 seconds between checks
+		}
+		// once we confirmed the DUT is on, we wait for it to power down again, which signals the flashing has finished
+		// wait initially for 60s and then every 10s before checking if the board performed a shutdown after flashing the internal storage
+		await Bluebird.delay(1000 * 60);
+		while (dutOn) {
+			await Bluebird.delay(1000 * 10); // 10 seconds between checks
+			console.log(`Waiting for TX2 to be off`);
+			dutOn = await this.checkDutPower();
+
+			/* If the ethernet is up, then we know the kernel is booted and the device is not in an inconsitent state */
+			if (!dutBooted) {
+				dutBooted = await this.checkDutBooted();
+			} else {
+				console.log(`TX2 is on and the kernel booted`);
+			}
+			// occasionally the DUT might appear to be powered down, but it isn't - we want to confirm that the DUT has stayed off for an interval of time
+			if (!dutOn) {
+				let offCount = 0;
+				console.log(`detected DUT has powered off - confirming...`);
+				for (let tries = 0; tries < POLL_TRIES; tries++) {
+					await Bluebird.delay(POLL_INTERVAL);
+					dutOn = await this.checkDutPower();
+					if (!dutOn) {
+						offCount += 1;
+					}
+				}
+				console.log(
+					`TX2 stayted off for ${offCount} checks, expected: ${POLL_TRIES}`,
+				);
+				if (offCount !== POLL_TRIES) {
+					// if the DUT didn't stay off, then we must try the loop again
+					dutOn = true;
+				}
+			}
+		}
+
+		if (dutOn) {
+			throw new Error('Timed out while waiting for TX2 to flash');
+			this.powerOffDUT();
+		} else {
+			console.log('TX2 finished provisioning and turned off');
+			return;
+		}
 	}
 }
 
