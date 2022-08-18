@@ -1,7 +1,4 @@
 import * as Bluebird from 'bluebird';
-import { fs } from 'mz';
-import * as Stream from 'stream';
-import * as zlib from 'zlib';
 import { TestBot } from './base';
 import * as sdk from 'etcher-sdk';
 import { BlockDeviceAdapter } from 'etcher-sdk/build/scanner/adapters';
@@ -60,29 +57,10 @@ export abstract class DeviceInteractor {
 	/**
 	 * Flash the SD card inside the SD Mux.
 	 *
-	 * @param stream Pass stream of the image file to be flashed
+	 * @param path Pass path of the image file to be flashed
 	 */
-	async flash(stream: Stream.Readable) {
-		await this.testBot.flash(stream);
-	}
-
-	/**
-	 * Specify filepath of image to flash and creates a stream of the image. Image
-	 * file should be compressed with gzip compressions (having file extension `.gz`).
-	 *
-	 * @param filePath file path of the image.
-	 * @throws Will result in error if the filepath end with `.zip`. Zip files are not supported.
-	 */
-	async flashFromFile(filePath: string) {
-		if (filePath.endsWith('.zip')) {
-			throw new Error('zip files are not supported');
-		}
-
-		let src: Stream.Readable = await fs.createReadStream(filePath);
-		if (filePath.endsWith('.gz')) {
-			src = src.pipe(zlib.createGunzip());
-		}
-		await this.flash(src);
+	async flash(path: string) {
+		await this.testBot.flash(path);
 	}
 
 	/** Signals the DUT to be powered off and close the DUT serial output stream. */
@@ -122,11 +100,11 @@ export abstract class FlasherDeviceInteractor extends DeviceInteractor {
 	 * Flash the external media (SD card, USB thumb drive) with the balenaOS flasher then
 	 * let it boot and wait for the DUT to be flashed with balenaOS.
 	 *
-	 * @param stream The stream of the flasher image file to be flashed onto the external installer media
+	 * @param stream The path of the flasher image file to be flashed onto the external installer media
 	 */
-	async flash(stream: Stream.Readable) {
+	async flash(path: string) {
 		// first flash the external media
-		await this.testBot.flash(stream);
+		await this.testBot.flash(path);
 		// wait for the DUT to self-shutdown after balenaOS flasher finishes provisiong the internal media
 		await this.waitInternalFlash();
 		// after the DUT has been provisioned with balenaOS, detach the external media from the DUT
@@ -530,7 +508,7 @@ export class BalenaFin extends DeviceInteractor {
 		await this.toggleUsb(true, 4);
 	}
 
-	async flash(stream: Stream.Readable) {
+	async flash(path: string) {
 		let tries = 0;
 		while (tries < 3) {
 			console.log(`Entering flash method for Fin, attempt ${tries + 1}`);
@@ -624,7 +602,7 @@ export class BalenaFin extends DeviceInteractor {
 			if (dest instanceof Object) {
 				await Bluebird.delay(1000); // Wait 1s before trying to flash
 				console.log('Flashing started...');
-				await this.testBot.flashToDisk(dest, stream);
+				await this.testBot.flashToDisk(dest, path);
 				console.log('Flashed!');
 				break;
 			}
@@ -689,7 +667,7 @@ export class Rpi243390 extends DeviceInteractor {
 		});
 	}
 
-	async flash(stream: Stream.Readable) {
+	async flash(path: string) {
 		let tries = 0;
 		while (tries < 3) {
 			console.log(`Entering flash method for Rpi243390, attempt ${tries + 1}`);
@@ -784,7 +762,7 @@ export class Rpi243390 extends DeviceInteractor {
 			if (dest instanceof Object) {
 				await Bluebird.delay(5000); // Wait 1s before trying to flash
 				console.log('Flashing started...');
-				await this.testBot.flashToDisk(dest, stream);
+				await this.testBot.flashToDisk(dest, path);
 				console.log('Flashed!');
 				break;
 			}

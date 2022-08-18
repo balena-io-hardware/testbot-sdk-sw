@@ -6,8 +6,6 @@ import * as Board from 'firmata';
 import { fs } from 'mz';
 import * as SerialPort from 'serialport';
 import * as Stream from 'stream';
-import * as util from 'util';
-const pipeline = util.promisify(Stream.pipeline);
 
 Bluebird.config({
 	cancellation: true,
@@ -137,17 +135,12 @@ export abstract class TestBot extends Board {
 
 	public async flashToDisk(
 		dst: sdk.sourceDestination.BlockDevice,
-		src: Stream.Readable,
+		src: string,
 	) {
-		const filePath = `/tmp/img.img`;
-		console.log(`Piping stream to file`);
-		await pipeline(src, fs.createWriteStream(filePath)).catch((e) => {
-			console.log(`Error piping image to file: ${e}`);
-		});
 
 		const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.File(
 			{
-				path: filePath,
+				path: src,
 			},
 		);
 		const innerSource = await sdkSource.getInnerSource();
@@ -174,7 +167,7 @@ export abstract class TestBot extends Board {
 	/**
 	 * Flash SD card with operating system
 	 */
-	public async flash(stream: Stream.Readable): Promise<void> {
+	public async flash(path: string): Promise<void> {
 		this.activeFlash = Bluebird.try(async () => {
 			await this.switchSdToHost(5000);
 
@@ -182,7 +175,7 @@ export abstract class TestBot extends Board {
 			const drive = await getDrive(await this.getDevInterface(this.DEV_SD));
 
 			this.log(`Start flashing the image`);
-			await this.flashToDisk(drive, stream);
+			await this.flashToDisk(drive, path);
 			this.log('Flashing completed');
 		});
 
