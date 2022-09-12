@@ -239,6 +239,19 @@ export class RPI3Neuron extends DeviceInteractor {
 	}
 }
 
+/** Implementation for RPI4Neuron like devices. */
+export class RPI4Neuron extends DeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 24);
+	}
+
+	async powerOn() {
+		await this.testBot.setVout(this.powerVoltage);
+		await this.testBot.switchSdToDUT(1000);
+		await this.testBot.powerOnDUT();
+	}
+}
+
 /** Implementation for Jetson Nano SD-CARD device. */
 export class JetsonNano extends DeviceInteractor {
 	constructor(testBot: TestBot) {
