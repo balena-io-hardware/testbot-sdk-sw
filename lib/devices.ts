@@ -295,12 +295,19 @@ export class Imx8mmebcrs08a2 extends FlasherDeviceInteractor {
 /** Implementation for Rockpi 4B RK3399 */
 export class Rockpi4bRk3399 extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
-		super(testBot, 5);
+		super(testBot, 12);
 	}
 }
 
 /** Implementation for the Coral Dev Board */
 export class CoralDevBoard extends FlasherDeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
+	}
+}
+
+/** Implementation for the iMX8MM-VAR-DART-NRT Board */
+export class Imx8mmVarDartNRT extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
 		super(testBot, 5);
 	}
