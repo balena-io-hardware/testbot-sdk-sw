@@ -306,6 +306,13 @@ export class CoralDevBoard extends FlasherDeviceInteractor {
 	}
 }
 
+/** Implementation for the iMX8MM-VAR-DART-NRT Board */
+export class Imx8mmVarDartNRT extends FlasherDeviceInteractor {
+	constructor(testBot: TestBot) {
+		super(testBot, 5);
+	}
+}
+
 /**
  * Implementation for Jetson TX2
  * We turn the TX2 on and off using GPIO26 on the testbot HAT, which is

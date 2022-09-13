@@ -18,6 +18,7 @@ import {
 	RPI3Neuron,
 	RPI4Neuron,
 	JetsonTX2,
+	Imx8mmVarDartNRT,
 } from './devices';
 
 export {
@@ -40,4 +41,5 @@ export {
 	RPI3Neuron,
 	RPI4Neuron,
 	JetsonTX2,
+	Imx8mmVarDartNRT,
 };
