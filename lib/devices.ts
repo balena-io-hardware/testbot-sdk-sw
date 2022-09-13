@@ -311,6 +311,18 @@ export class Imx8mmVarDartNRT extends FlasherDeviceInteractor {
 	constructor(testBot: TestBot) {
 		super(testBot, 5);
 	}
+
+	async checkDutPower() {
+		const outCurrent = await this.testBot.readVoutAmperage();
+		console.log(`Out current is: ` + outCurrent);
+		if (outCurrent > 0.03) {
+			console.log(`Imx8mmVarDartNRT is currently On`);
+			return true;
+		} else {
+			console.log(`Imx8mmVarDartNRT is currently Off`);
+			return false;
+		}
+	}
 }
 
 /**
