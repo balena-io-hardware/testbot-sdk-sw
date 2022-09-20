@@ -19,6 +19,7 @@ import {
 	RPI4Neuron,
 	JetsonTX2,
 	Imx8mmVarDartNRT,
+	RockPro64,
 } from '../lib';
 import { getSdk } from 'balena-sdk';
 
@@ -113,6 +114,12 @@ const resolveImageInfo = async (dutType: string) => {
 		case 'imx8mm-var-dart-nrt': {
 			return {
 				deviceType: 'imx8mm-var-dart-nrt',
+				version: await resolveDutOsVersion(),
+			};
+		}
+		case 'rockpro64': {
+			return {
+				deviceType: 'rockpro64',
 				version: await resolveDutOsVersion(),
 			};
 		}
@@ -238,6 +245,9 @@ export function createDeviceInteractor(testbotHat: TestBotHat) {
 		}
 		case 'imx8mm-var-dart-nrt': {
 			return new Imx8mmVarDartNRT(testbotHat);
+		}
+		case 'rockpro64': {
+			return new RockPro64(testbotHat);
 		}
 		default: {
 			return new RaspberryPi(testbotHat);
