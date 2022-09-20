@@ -1,6 +1,6 @@
 {
   "name": "@balena/testbot",
-  "version": "1.9.22",
+  "version": "1.9.23",
   "description": "Testbot SDK",
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
@@ -55,6 +55,6 @@
     "typescript": "^3.8.3"
   },
   "versionist": {
-    "publishedAt": "2022-09-13T16:38:54.946Z"
+    "publishedAt": "2022-09-20T13:29:16.630Z"
   }
 }
