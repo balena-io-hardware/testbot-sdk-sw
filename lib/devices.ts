@@ -151,6 +151,10 @@ export abstract class FlasherDeviceInteractor extends DeviceInteractor {
 		await this.testBot.powerOffDUT();
 		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		await this.testBot.setVout(this.powerVoltage);
+
+		// Add a slight delay here to ensure that the DUT does not power on before the MUX is actually toggled to the DUT. 
+		await Bluebird.delay(1000*5);
+		
 		console.log('Booting DUT with the balenaOS flasher image');
 		await this.testBot.powerOnDUT();
 
