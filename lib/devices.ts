@@ -265,6 +265,7 @@ export class JetsonNano extends DeviceInteractor {
 	async powerOn() {
 		await this.testBot.setVout(this.powerVoltage);
 		await this.testBot.switchSdToDUT(1000);
+		await Bluebird.delay(1000*5);
 		await this.testBot.powerOnDUT();
 	}
 }
@@ -546,8 +547,8 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		}
 
 		if (dutOn) {
+			await this.powerOffDUT();
 			throw new Error('Timed out while waiting for TX2 to flash');
-			this.powerOffDUT();
 		} else {
 			console.log('TX2 finished provisioning and turned off');
 			return;
