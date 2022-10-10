@@ -1,0 +1,700 @@
+- commits:
+    - subject: Switch from balenaCI to flowzone
+      hash: 39bc4e019e4f629a61a5d581db858a2b21d80ca2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+      author: Pagan Gazzard
+  version: 1.9.24
+  title: ""
+  date: 2022-10-10T16:40:39.111Z
+- version: 1.9.23
+  date: 2022-09-20T13:35:00Z
+  commits:
+    - hash: cd3217445242c413b1dc73cd3671e1993e8248d3
+      author: Alexandru Costache
+      footers:
+        change-type: patch
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+      subject: "lib/devices: Add RockPro64"
+      body: null
+- version: 1.9.22
+- date: 2022-09-13T18:43:50Z
+- commits:
+    - hash: e2c563243a10a42df0ef05d8746518951d46971d
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib/devices: Check current on iMX8MM-VAR-DART-NRT"
+- commits:
+    - body: |-
+        This DT does not have any USB or ETH ports so
+        we can only rely on out current to determine
+        when it finished flashing.
+- version: 1.9.21
+- date: 2022-09-13T09:08:31Z
+- commits:
+    - hash: 49d21452b383d8714e349f5d59677154404e9fd6
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib/devices: Increase voltage for RockPi 4B"
+- commits:
+    - body: |-
+        According to Radxa, the board may boot on 5Vt will
+        cause stability issues once the load rises.
+- commits:
+    - hash: 50e787ad39805d3d23e917832fe7d003642d4833
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add imx8mm-var-dart-nrt support to testbotsdk"
+- commits:
+    - ? body
+- version: 1.9.20
+- date: 2022-09-12T08:53:04Z
+- commits:
+    - hash: fb034b0808788af3e8c0c3f18e6cc41554511389
+- commits:
+    - author: Florin Sarbu
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Florin Sarbu <florin@balena.io>
+- commits:
+    - subject: "lib: Add RPi4 Unipi Neuron support to testbot"
+- commits:
+    - ? body
+- version: 1.9.19
+- date: 2022-08-08T14:49:07Z
+- commits:
+    - hash: d9e179342429200aff18cf9889b2a0d34abb4c5d
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "TX2: Add flashing support"
+- commits:
+    - ? body
+- version: 1.9.18
+- date: 2022-07-21T08:53:40Z
+- commits:
+    - hash: 205f56c7b467b8a21e072469724915a423757ca6
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add RPI3 Neuron support to testbot"
+- commits:
+    - ? body
+- version: 1.9.17
+- date: 2022-07-18T13:02:32Z
+- commits:
+    - hash: 4f0dede2c35cb4dda9351683487e2fdc89397852
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add support for RT Rpi 300 CDS device type"
+- commits:
+    - ? body
+- commits:
+    - hash: 15ea8ba326828945357c1544a87815fdda3747d3
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Prettify sources"
+- commits:
+    - ? body
+- version: 1.9.16
+- date: 2022-06-23T11:18:22Z
+- commits:
+    - hash: 7f0a651af3e3843ba36af292243574575c1fb16f
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "test: Fix typo in revpi-connect slug"
+- commits:
+    - ? body
+- version: 1.9.15
+- date: 2022-06-22T14:00:46Z
+- commits:
+    - hash: 3fb5f9a63a23575661b888842207f6a9b0888119
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib/devices: Add RevPi Connect support"
+- commits:
+    - ? body
+- version: 1.9.14
+- date: 2022-06-03T07:02:11Z
+- commits:
+    - hash: e9fad1973a42b350086d5822cc8ca4af4c702199
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexnadru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Remove git patch"
+- commits:
+    - body: |-
+        This patch was commited accidentally and is not used or
+        needed, so we should remove it.
+- version: 1.9.13
+- date: 2022-04-25T10:14:52Z
+- commits:
+    - hash: 1e55f7323019c7303cc7a60db923538fce04f2cb
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add Pi3 243390 support"
+- commits:
+    - ? body
+- commits:
+    - hash: dd1d2b9e5d54ed444f92d3fa6abb586b8f987cd0
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "package-lock: Update etcher-sdk from 2.0.20 to 7.1.0"
+- commits:
+    - body: |-
+        To include updated node-raspberrypi-usbboot for
+        custom RPIs with eMMC
+- commits:
+    - hash: 09daad8baa2c8953c9bd1a0733ce7d675f15e99b
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Fix linting errors after updating to etcher-sdk 7.0.1"
+- commits:
+    - body: And use the latest Fin usb toggle method
+- commits:
+    - hash: d40d3ef5b2331799b6ed3e9f8ee282c4382a0956
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "Dockerfile: Install dependencies after updating to etcher-sdk 7.0.1"
+- commits:
+    - body: So that balena push build succeeds
+- commits:
+    - hash: 207723fea83b7dd93420242fc2240a1a18342eba
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "Dockerfile: Fix build by installing uhubctl from debian"
+- commits:
+    - ? body
+- commits:
+    - hash: a656906af9c9264efc342b67205dd41318e3190d
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Atapt to newer etcher-sdk"
+- commits:
+    - ? body
+- commits:
+    - hash: 7d4833eca49abd5eb17fc6ffc2296dfa4c9bd822
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: update multiwrite.pipeSourceToDestinations args
+- commits:
+    - ? body
+- commits:
+    - hash: fcb1e3809aa673e532e772cd71d21a15a111cd9e
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        author: Ryan Cooke
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: Wait longer before flashing 2443390, use inner source, pipe to file
+- commits:
+    - body: |-
+        These changes are ported from Ryan's PR and
+        all are needed for flashing the 243390 RPI3.
+        These have been tested on the 243390 and on the Pi4 v1.5
+- commits:
+    - hash: 3c644a2115bfc0ddd835d35bd87781088eb22e05
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: update fin class with etcher sdk updates
+- commits:
+    - ? body
+- version: 1.9.12
+- date: 2022-03-30T13:17:33Z
+- commits:
+    - hash: ff957fdbdcf7f1d5fa48178dc3dae3a8faec34a8
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add Rockchip 4B RK3399"
+- commits:
+    - ? body
+- version: 1.9.11
+- date: 2022-03-21T11:58:44Z
+- commits:
+    - hash: 6303fa3daa31f0e5046b167a909a6e3bd203fc24
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "device: Add Coral Dev support to testbot"
+- commits:
+    - ? body
+- commits:
+    - hash: b212f208d145cd73a2e77f2bfce942dd8a414f21
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "device: Add Jetson Nano SD-CARD support to testbot"
+- commits:
+    - ? body
+- version: 1.9.10
+- date: 2022-03-17T16:03:48Z
+- commits:
+    - hash: 79e65d21b9f88a348ec9dce2d284c52a706bef36
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "docker-compose: Add sysfs label"
+- commits:
+    - body: |-
+        Add sysfs label so that the eth1 carrier
+        can be accessed for checking whether the flashed device
+        is on or off.
+- commits:
+    - hash: 43f568283a203c6cb0bae2e17e8be4b3410c6f64
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "Dockerfile: Fix build"
+- commits:
+    - body: |-
+        The scripts and bin directories which used
+        to contain uhubctl related files have been
+        removed, and the build was failing. Fix that
+        by removing them from the Dockerfile
+- commits:
+    - hash: eb1ac7cae0e63efb6a0e2a5740ad2c1d7e71544c
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add imx8mmebcrsa2 2g support to testbot"
+- commits:
+    - body: and include it in the the provisioning test
+- version: 1.9.9
+- date: 2022-02-24T08:02:59Z
+- commits:
+    - hash: 92c37b4569791bcea284c171d9a2eff7ab88f70b
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alex.bucknall@gmail.com>
+- commits:
+    - subject: Reduced delays on fin dut
+- commits:
+    - ? body
+- version: 1.9.8
+- date: 2022-02-23T11:38:51Z
+- commits:
+    - hash: 799e0c52ae6aa80c49c9604fb6bfab4b26db4442
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: confirm DUT is powered down after internal flash
+- commits:
+    - ? body
+- version: 1.9.7
+- date: 2022-02-22T12:54:24Z
+- commits:
+    - hash: bbb8075ef418a5c4605c25b630f716490c386b33
+- commits:
+    - author: Florin Sarbu
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Florin Sarbu <florin@balena.io>
+- commits:
+    - subject: "devices.ts: Introduce flasher class, switch the BeagleBone to use it"
+- commits:
+    - body: |-
+        We introduce a new class FlasherDeviceInteractor to be used by boards
+        that need to flash balenaOS onto internal media. These boards typically
+        boot a flasher image from SD or USB and then self-shutdown once their
+        internal storage has been provisioned with balenaOS.
+        Also we switch now the BeagleBone DUT to use this new flasher class.
+- version: 1.9.6
+- date: 2022-02-18T17:07:20Z
+- commits:
+    - hash: 44d873e122803b04c777be05d7f1b67e74888e2c
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: "fin: use correct repeat flag in uhubctl"
+- commits:
+    - ? body
+- version: 1.9.5
+- date: 2022-02-16T12:49:27Z
+- commits:
+    - hash: 8c80a7446e7bcb1fd4f56e75e703bc32bf628381
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: "fin: toggle hub twice to make flashing consistant"
+- commits:
+    - ? body
+- version: 1.9.4
+- date: 2021-12-14T14:06:48Z
+- commits:
+    - hash: e59bbb256df18f4d8b43b14f048641757a72b084
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add CM4 IO-Board support to testbot"
+- commits:
+    - ? body
+- version: 1.9.3
+- date: 2021-11-24T11:25:32Z
+- commits:
+    - hash: 302714473f2f28bbff2d72f0495fbe8b7bf528e9
+- commits:
+    - author: Alexandru Costache
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+- commits:
+    - subject: "lib: Add Revolution Pi Core 3 support to testbot"
+- commits:
+    - ? body
+- version: 1.9.2
+- date: 2021-10-20T09:15:30Z
+- commits:
+    - hash: cff5ae0adc06809a458e030c701af9f81a043bd8
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: add beaglebone
+- commits:
+    - ? body
+- version: 1.9.1
+- date: 2021-06-30T15:57:00Z
+- commits:
+    - hash: 72ca6097a467b9ecad3fa38751b032a84cd69cfb
+- commits:
+    - author: Vipul Gupta
+- commits:
+    - subject: "patch: Delete Codeowners"
+- commits:
+    - ? body
+- version: 1.9.0
+- date: 2021-04-27T12:23:14Z
+- commits:
+    - hash: 4de9fa922dfc20f42d7a2ce6624a0804ea1b8976
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alexbucknall@balena.io>
+- commits:
+    - subject: Adds support for balenaFin (v09 to v11)
+- commits:
+    - ? body
+- version: 1.8.0
+- date: 2021-03-23T13:35:27Z
+- commits:
+    - hash: 36ddf8da41716987de10c0cd6d5e0772c04b924a
+- commits:
+    - author: Alex Bucknall
+- commits:
+    - footers:
+        change-type: minor
+- commits:
+    - footers:
+        signed-off-by: Alex Bucknall <alexbucknall@balena.io>
+- commits:
+    - subject: Added LICENSE
+- commits:
+    - body: "\r"
+- version: 1.7.12
+- date: 2021-02-26T10:54:09Z
+- commits:
+    - hash: e7cdffdb4ff08e98f1f0f637e53fa4a5f3d2b215
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: add nuc timeout
+- commits:
+    - ? body
+- commits:
+    - hash: 904824c6ac13adf035e13e9ae2a239d725820ef5
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: remove global
+- commits:
+    - ? body
+- version: 1.7.11
+- date: 2021-02-24T13:06:36Z
+- commits:
+    - hash: 76cd1ccae4f3bd69c7931594e9cfbd57e8c052c3
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: Add time to switch SD to DUT for intel-nuc
+- commits:
+    - ? body
+- version: 1.7.10
+- date: 2021-02-23T14:01:24Z
+- commits:
+    - hash: fb774ef54b820ed17c6e9ec9512a1ee33cd44e93
+- commits:
+    - author: Vipul Gupta (@vipulgupta2048)
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Vipul Gupta (@vipulgupta2048) <vipul@balena.io>
+- commits:
+    - subject: Improve log message
+- commits:
+    - ? body
+- version: 1.7.9
+- date: 2021-02-23T10:50:25Z
+- commits:
+    - hash: d29fd08fddf099f929d7a4854549a336c033b7b1
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: prettify and add codeowners
+- commits:
+    - ? body
+- version: 1.7.8
+- date: 2021-02-23T10:17:48Z
+- commits:
+    - hash: 180df583f94420c558c2f086871a0bfec23016e8
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: make nuc flashing more consistant
+- commits:
+    - ? body
+- commits:
+    - hash: 4b2a561ef5f4aa51d0c429a0982a659612e71c29
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: increase serial timeout to give time to boot
+- commits:
+    - ? body
+- commits:
+    - hash: ee3bd870941baed312d898bfd0beebc7366bf5d1
+- commits:
+    - author: rcooke-warwick
+- commits:
+    - footers:
+        change-type: patch
+- commits:
+    - footers:
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+- commits:
+    - subject: add better current logging
+- commits:
+    - ? body
