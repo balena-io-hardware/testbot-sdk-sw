@@ -152,8 +152,8 @@ export abstract class FlasherDeviceInteractor extends DeviceInteractor {
 		await this.testBot.switchSdToDUT(1000); // Wait for 1s after toggling mux, to ensure that the mux is toggled to DUT before powering it on
 		await this.testBot.setVout(this.powerVoltage);
 
-		// Add a slight delay here to ensure that the DUT does not power on before the MUX is actually toggled to the DUT. 
-		await Bluebird.delay(1000*5);
+		// Add a slight delay here to ensure that the DUT does not power on before the MUX is actually toggled to the DUT.
+		await Bluebird.delay(1000 * 5);
 
 		console.log('Booting DUT with the balenaOS flasher image');
 		await this.testBot.powerOnDUT();
@@ -265,7 +265,7 @@ export class JetsonNano extends DeviceInteractor {
 	async powerOn() {
 		await this.testBot.setVout(this.powerVoltage);
 		await this.testBot.switchSdToDUT(1000);
-		await Bluebird.delay(1000*5);
+		await Bluebird.delay(1000 * 5);
 		await this.testBot.powerOnDUT();
 	}
 }
@@ -334,7 +334,7 @@ export class Imx8mmVarDartNRT extends FlasherDeviceInteractor {
 		const outCurrent = await this.testBot.readVoutAmperage();
 		console.log(`Out current is: ` + outCurrent);
 		// Add upper bound as sometimes current sensor report ~80A when DUT is powering off
-		if ((outCurrent > 0.03) && (outCurrent < 50)) {
+		if (outCurrent > 0.03 && outCurrent < 50) {
 			console.log(`Imx8mmVarDartNRT is currently On`);
 			return true;
 		} else {
