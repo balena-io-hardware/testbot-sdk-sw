@@ -1,4 +1,44 @@
 - commits:
+    - subject: "lib/devices: fix linting errors for Test npm"
+      hash: 9480f8b4e9979c5a56f6d57e65552d83667a464f
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Alexandru Costache <alexandru@balena.io>
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+      author: Alexandru Costache
+    - subject: add slight delay after mux toggle for jetson nano
+      hash: d55cb8e65a529fd986c5d3c047ea77ae081a9e8a
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ryan Cooke <ryan@balena.io>
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+      author: rcooke-warwick
+    - subject: fix current threshold on Imx8mmVarDartNRT
+      hash: b715b1f2fbe3ea0cbc70f4305ed2d5e4755e6508
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ryan Cooke <ryan@balena.io>
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+      author: rcooke-warwick
+    - subject: add delay between mux toggle and power on
+      hash: 82f958c0276d3c11856b11c63f732bad1f2ba2cb
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ryan Cooke <ryan@balena.io>
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+      author: rcooke-warwick
+  version: 1.9.25
+  title: ""
+  date: 2022-11-10T16:17:32.283Z
+- commits:
     - subject: Switch from balenaCI to flowzone
       hash: 39bc4e019e4f629a61a5d581db858a2b21d80ca2
       body: ""
@@ -66,7 +106,7 @@
 - commits:
     - subject: "lib: Add imx8mm-var-dart-nrt support to testbotsdk"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.20
 - date: 2022-09-12T08:53:04Z
 - commits:
@@ -82,7 +122,7 @@
 - commits:
     - subject: "lib: Add RPi4 Unipi Neuron support to testbot"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.19
 - date: 2022-08-08T14:49:07Z
 - commits:
@@ -98,7 +138,7 @@
 - commits:
     - subject: "TX2: Add flashing support"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.18
 - date: 2022-07-21T08:53:40Z
 - commits:
@@ -114,7 +154,7 @@
 - commits:
     - subject: "lib: Add RPI3 Neuron support to testbot"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.17
 - date: 2022-07-18T13:02:32Z
 - commits:
@@ -130,7 +170,7 @@
 - commits:
     - subject: "lib: Add support for RT Rpi 300 CDS device type"
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 15ea8ba326828945357c1544a87815fdda3747d3
 - commits:
@@ -141,7 +181,7 @@
 - commits:
     - subject: "lib: Prettify sources"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.16
 - date: 2022-06-23T11:18:22Z
 - commits:
@@ -157,7 +197,7 @@
 - commits:
     - subject: "test: Fix typo in revpi-connect slug"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.15
 - date: 2022-06-22T14:00:46Z
 - commits:
@@ -173,7 +213,7 @@
 - commits:
     - subject: "lib/devices: Add RevPi Connect support"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.14
 - date: 2022-06-03T07:02:11Z
 - commits:
@@ -207,7 +247,7 @@
 - commits:
     - subject: "lib: Add Pi3 243390 support"
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: dd1d2b9e5d54ed444f92d3fa6abb586b8f987cd0
 - commits:
@@ -256,7 +296,7 @@
 - commits:
     - subject: "Dockerfile: Fix build by installing uhubctl from debian"
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: a656906af9c9264efc342b67205dd41318e3190d
 - commits:
@@ -267,7 +307,7 @@
 - commits:
     - subject: "lib: Atapt to newer etcher-sdk"
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 7d4833eca49abd5eb17fc6ffc2296dfa4c9bd822
 - commits:
@@ -281,7 +321,7 @@
 - commits:
     - subject: update multiwrite.pipeSourceToDestinations args
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: fcb1e3809aa673e532e772cd71d21a15a111cd9e
 - commits:
@@ -312,7 +352,7 @@
 - commits:
     - subject: update fin class with etcher sdk updates
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.12
 - date: 2022-03-30T13:17:33Z
 - commits:
@@ -328,7 +368,7 @@
 - commits:
     - subject: "lib: Add Rockchip 4B RK3399"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.11
 - date: 2022-03-21T11:58:44Z
 - commits:
@@ -344,7 +384,7 @@
 - commits:
     - subject: "device: Add Coral Dev support to testbot"
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: b212f208d145cd73a2e77f2bfce942dd8a414f21
 - commits:
@@ -355,7 +395,7 @@
 - commits:
     - subject: "device: Add Jetson Nano SD-CARD support to testbot"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.10
 - date: 2022-03-17T16:03:48Z
 - commits:
@@ -416,7 +456,7 @@
 - commits:
     - subject: Reduced delays on fin dut
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.8
 - date: 2022-02-23T11:38:51Z
 - commits:
@@ -432,7 +472,7 @@
 - commits:
     - subject: confirm DUT is powered down after internal flash
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.7
 - date: 2022-02-22T12:54:24Z
 - commits:
@@ -469,7 +509,7 @@
 - commits:
     - subject: "fin: use correct repeat flag in uhubctl"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.5
 - date: 2022-02-16T12:49:27Z
 - commits:
@@ -485,7 +525,7 @@
 - commits:
     - subject: "fin: toggle hub twice to make flashing consistant"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.4
 - date: 2021-12-14T14:06:48Z
 - commits:
@@ -501,7 +541,7 @@
 - commits:
     - subject: "lib: Add CM4 IO-Board support to testbot"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.3
 - date: 2021-11-24T11:25:32Z
 - commits:
@@ -517,7 +557,7 @@
 - commits:
     - subject: "lib: Add Revolution Pi Core 3 support to testbot"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.2
 - date: 2021-10-20T09:15:30Z
 - commits:
@@ -533,7 +573,7 @@
 - commits:
     - subject: add beaglebone
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.1
 - date: 2021-06-30T15:57:00Z
 - commits:
@@ -543,7 +583,7 @@
 - commits:
     - subject: "patch: Delete Codeowners"
 - commits:
-    - ? body
+    - body: null
 - version: 1.9.0
 - date: 2021-04-27T12:23:14Z
 - commits:
@@ -559,7 +599,7 @@
 - commits:
     - subject: Adds support for balenaFin (v09 to v11)
 - commits:
-    - ? body
+    - body: null
 - version: 1.8.0
 - date: 2021-03-23T13:35:27Z
 - commits:
@@ -591,7 +631,7 @@
 - commits:
     - subject: add nuc timeout
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 904824c6ac13adf035e13e9ae2a239d725820ef5
 - commits:
@@ -605,7 +645,7 @@
 - commits:
     - subject: remove global
 - commits:
-    - ? body
+    - body: null
 - version: 1.7.11
 - date: 2021-02-24T13:06:36Z
 - commits:
@@ -621,7 +661,7 @@
 - commits:
     - subject: Add time to switch SD to DUT for intel-nuc
 - commits:
-    - ? body
+    - body: null
 - version: 1.7.10
 - date: 2021-02-23T14:01:24Z
 - commits:
@@ -637,7 +677,7 @@
 - commits:
     - subject: Improve log message
 - commits:
-    - ? body
+    - body: null
 - version: 1.7.9
 - date: 2021-02-23T10:50:25Z
 - commits:
@@ -653,7 +693,7 @@
 - commits:
     - subject: prettify and add codeowners
 - commits:
-    - ? body
+    - body: null
 - version: 1.7.8
 - date: 2021-02-23T10:17:48Z
 - commits:
@@ -669,7 +709,7 @@
 - commits:
     - subject: make nuc flashing more consistant
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: 4b2a561ef5f4aa51d0c429a0982a659612e71c29
 - commits:
@@ -683,7 +723,7 @@
 - commits:
     - subject: increase serial timeout to give time to boot
 - commits:
-    - ? body
+    - body: null
 - commits:
     - hash: ee3bd870941baed312d898bfd0beebc7366bf5d1
 - commits:
@@ -697,4 +737,4 @@
 - commits:
     - subject: add better current logging
 - commits:
-    - ? body
+    - body: null
