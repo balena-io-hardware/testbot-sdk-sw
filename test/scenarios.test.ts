@@ -28,9 +28,7 @@ describe('Testbot', () => {
 	it(
 		`can flash OS image to ${resolveDutType()}`,
 		async () => {
-			await deviceInteractor.flashFromFile(
-				await resolveDutOsImage(resolveDutType()),
-			);
+			await deviceInteractor.flash(await resolveDutOsImage(resolveDutType()));
 		},
 		10 * 60 * 1000, // 10 minutes.
 	);
