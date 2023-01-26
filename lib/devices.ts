@@ -1,7 +1,4 @@
 import * as Bluebird from 'bluebird';
-import { fs } from 'mz';
-import * as Stream from 'stream';
-import * as zlib from 'zlib';
 import { TestBot } from './base';
 import * as sdk from 'etcher-sdk';
 import { BlockDeviceAdapter } from 'etcher-sdk/build/scanner/adapters';
@@ -62,8 +59,8 @@ export abstract class DeviceInteractor {
 	 *
 	 * @param stream Pass stream of the image file to be flashed
 	 */
-	async flash(stream: Stream.Readable) {
-		await this.testBot.flash(stream);
+	async flash(filePath: string) {
+		await this.testBot.flash(filePath);
 	}
 
 	/**
@@ -78,11 +75,7 @@ export abstract class DeviceInteractor {
 			throw new Error('zip files are not supported');
 		}
 
-		let src: Stream.Readable = await fs.createReadStream(filePath);
-		if (filePath.endsWith('.gz')) {
-			src = src.pipe(zlib.createGunzip());
-		}
-		await this.flash(src);
+		await this.flash(filePath);
 	}
 
 	/** Signals the DUT to be powered off and close the DUT serial output stream. */
@@ -124,9 +117,9 @@ export abstract class FlasherDeviceInteractor extends DeviceInteractor {
 	 *
 	 * @param stream The stream of the flasher image file to be flashed onto the external installer media
 	 */
-	async flash(stream: Stream.Readable) {
+	async flash(filePath: string) {
 		// first flash the external media
-		await this.testBot.flash(stream);
+		await this.testBot.flash(filePath);
 		// wait for the DUT to self-shutdown after balenaOS flasher finishes provisiong the internal media
 		await this.waitInternalFlash();
 		// after the DUT has been provisioned with balenaOS, detach the external media from the DUT
@@ -431,12 +424,10 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await this.enableGPIOs();
 		await this.powerOnRelay();
 		await Bluebird.delay(500);
-		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 1 && echo 1 > /sys/class/gpio/gpio26/value`,
-		).catch(() => {
-			console.log(`Failed to trigger power on sequence on Jetson TX2`);
-		});
-		await Bluebird.delay(1000);
+		await exec(`echo 0 > /sys/class/gpio/gpio26/value`);
+		await Bluebird.delay(3000);
+		await exec(`echo 1 > /sys/class/gpio/gpio26/value`);
+		await Bluebird.delay(3000);
 		console.log(`Triggered power on sequence on TX2`);
 	}
 
@@ -457,11 +448,9 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		await this.powerOnRelay();
 		await Bluebird.delay(500);
 		/* Forcedly power off device, even if it is on */
-		await exec(
-			`echo out > /sys/class/gpio/gpio26/direction && echo 0 > /sys/class/gpio/gpio26/value && sleep 8 && echo 1 > /sys/class/gpio/gpio26/value`,
-		).catch(() => {
-			console.log(`Failed to trigger power off sequence on TX2`);
-		});
+		await exec(`echo 0 > /sys/class/gpio/gpio26/value`);
+		await Bluebird.delay(10 * 1000);
+		await exec(`echo 1 > /sys/class/gpio/gpio26/value`);
 
 		console.log(`Triggered power off sequence on TX2`);
 		await Bluebird.delay(1000);
@@ -581,7 +570,7 @@ export class BalenaFin extends DeviceInteractor {
 		await this.toggleUsb(true, 4);
 	}
 
-	async flash(stream: Stream.Readable) {
+	async flash(filePath: string) {
 		let tries = 0;
 		while (tries < 3) {
 			console.log(`Entering flash method for Fin, attempt ${tries + 1}`);
@@ -675,7 +664,7 @@ export class BalenaFin extends DeviceInteractor {
 			if (dest instanceof Object) {
 				await Bluebird.delay(1000); // Wait 1s before trying to flash
 				console.log('Flashing started...');
-				await this.testBot.flashToDisk(dest, stream);
+				await this.testBot.flashToDisk(dest, filePath);
 				console.log('Flashed!');
 				break;
 			}
@@ -740,7 +729,7 @@ export class Rpi243390 extends DeviceInteractor {
 		});
 	}
 
-	async flash(stream: Stream.Readable) {
+	async flash(filePath: string) {
 		let tries = 0;
 		while (tries < 3) {
 			console.log(`Entering flash method for Rpi243390, attempt ${tries + 1}`);
@@ -835,7 +824,7 @@ export class Rpi243390 extends DeviceInteractor {
 			if (dest instanceof Object) {
 				await Bluebird.delay(5000); // Wait 1s before trying to flash
 				console.log('Flashing started...');
-				await this.testBot.flashToDisk(dest, stream);
+				await this.testBot.flashToDisk(dest, filePath);
 				console.log('Flashed!');
 				break;
 			}
