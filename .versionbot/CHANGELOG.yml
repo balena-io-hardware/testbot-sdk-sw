@@ -1,4 +1,17 @@
 - commits:
+    - subject: increase delay between relay toggling for tx2
+      hash: 7a5949e2e643cda5a0f9729f09968796baa6c6c9
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ryan Cooke <ryan@balena.io>
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+      author: rcooke-warwick
+  version: 1.9.26
+  title: ""
+  date: 2023-01-26T15:49:01.045Z
+- commits:
     - subject: "lib/devices: fix linting errors for Test npm"
       hash: 9480f8b4e9979c5a56f6d57e65552d83667a464f
       body: ""
