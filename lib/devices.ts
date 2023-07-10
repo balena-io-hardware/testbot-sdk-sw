@@ -415,7 +415,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 		if (dutIsOn) {
 			console.log('TX2 is booted, trigger normal shutdown');
 			/* Simulate short press on the power button */
-			await this.powerOnDUT();
+			await this.powerOffDUT();
 		} else {
 			console.log('TX2 is not booted, no power toggle needed');
 		}
@@ -423,7 +423,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	async powerOnDUT() {
 		await this.enableGPIOs();
 		await this.powerOnRelay();
-		await Bluebird.delay(500);
+		await Bluebird.delay(1000);
 		await exec(`echo 0 > /sys/class/gpio/gpio26/value`);
 		await Bluebird.delay(3000);
 		await exec(`echo 1 > /sys/class/gpio/gpio26/value`);
@@ -446,7 +446,7 @@ export class JetsonTX2 extends FlasherDeviceInteractor {
 	async powerOffDUT() {
 		await this.enableGPIOs();
 		await this.powerOnRelay();
-		await Bluebird.delay(500);
+		await Bluebird.delay(1000);
 		/* Forcedly power off device, even if it is on */
 		await exec(`echo 0 > /sys/class/gpio/gpio26/value`);
 		await Bluebird.delay(10 * 1000);
