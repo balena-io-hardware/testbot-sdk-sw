@@ -1,4 +1,17 @@
 - commits:
+    - subject: "jetsonTx2: ensure DUT is off when powerOff"
+      hash: fc95a1917861861bdf8e7bb5c62cb77cbea002f2
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ryan Cooke <ryan@balena.io>
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+      author: rcooke-warwick
+  version: 1.9.27
+  title: ""
+  date: 2023-07-13T08:00:35.010Z
+- commits:
     - subject: increase delay between relay toggling for tx2
       hash: 7a5949e2e643cda5a0f9729f09968796baa6c6c9
       body: ""
