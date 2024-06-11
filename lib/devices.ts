@@ -92,7 +92,7 @@ export abstract class DeviceInteractor {
 	 * each device has a widely different power on procedure and different voltage
 	 * needed hence the method is kept abstract.
 	 */
-	abstract async powerOn(): Promise<void>;
+	abstract powerOn(): Promise<void>;
 }
 
 /**
@@ -593,8 +593,8 @@ export class BalenaFin extends DeviceInteractor {
 			const deviceScanner = new sdk.scanner.Scanner(adapters);
 			console.log('Waiting for compute module');
 			// Wait for compute module to appear over usb
-			const computeModule: sdk.sourceDestination.UsbbootDrive = await new Promise(
-				(resolve, reject) => {
+			const computeModule: sdk.sourceDestination.UsbbootDrive =
+				await new Promise((resolve, reject) => {
 					function onAttach(
 						drive: sdk.scanner.adapters.AdapterSourceDestination,
 					) {
@@ -606,8 +606,7 @@ export class BalenaFin extends DeviceInteractor {
 					deviceScanner.on('attach', onAttach);
 					deviceScanner.on('error', reject);
 					deviceScanner.start();
-				},
-			);
+				});
 			console.log('Compute module attached');
 			// wait to convert to block device.
 			await new Promise<void>((resolve, reject) => {
@@ -751,8 +750,8 @@ export class Rpi243390 extends DeviceInteractor {
 			const deviceScanner = new sdk.scanner.Scanner(adapters);
 			console.log('Waiting for eMMC');
 			// Wait for compute module to appear over usb
-			const computeModule: sdk.sourceDestination.UsbbootDrive = await new Promise(
-				(resolve, reject) => {
+			const computeModule: sdk.sourceDestination.UsbbootDrive =
+				await new Promise((resolve, reject) => {
 					function onAttach(
 						drive: sdk.scanner.adapters.AdapterSourceDestination,
 					) {
@@ -764,8 +763,7 @@ export class Rpi243390 extends DeviceInteractor {
 					deviceScanner.on('attach', onAttach);
 					deviceScanner.on('error', reject);
 					deviceScanner.start();
-				},
-			);
+				});
 			console.log('Compute module attached');
 			// wait to convert to block device.
 			await new Promise<void>((resolve, reject) => {
