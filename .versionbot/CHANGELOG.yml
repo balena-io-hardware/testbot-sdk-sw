@@ -1,4 +1,17 @@
 - commits:
+    - subject: update to node 18
+      hash: 294071b394ff3ed09828691b2667e4b9974bd106
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Ryan Cooke <ryan@balena.io>
+        signed-off-by: Ryan Cooke <ryan@balena.io>
+      author: rcooke-warwick
+  version: 1.9.28
+  title: ""
+  date: 2024-06-13T15:36:42.771Z
+- commits:
     - subject: "jetsonTx2: ensure DUT is off when powerOff"
       hash: fc95a1917861861bdf8e7bb5c62cb77cbea002f2
       body: ""
