@@ -80,7 +80,7 @@ export abstract class TestBot extends Board {
 		interface WriteState {
 			pending: number;
 		}
-		const state = (this as unknown) as WriteState;
+		const state = this as unknown as WriteState;
 
 		for (let i = 0; i < TestBot.PENDING_WRITE_MAX_CHECKS; i++) {
 			if (state.pending === 0) {
@@ -137,11 +137,10 @@ export abstract class TestBot extends Board {
 		dst: sdk.sourceDestination.BlockDevice,
 		filePath: string,
 	) {
-		const sdkSource: sdk.sourceDestination.SourceDestination = new sdk.sourceDestination.File(
-			{
+		const sdkSource: sdk.sourceDestination.SourceDestination =
+			new sdk.sourceDestination.File({
 				path: filePath,
-			},
-		);
+			});
 		const innerSource = await sdkSource.getInnerSource();
 		const result = await sdk.multiWrite.pipeSourceToDestinations({
 			source: innerSource,
@@ -255,24 +254,24 @@ export abstract class TestBot extends Board {
 	}
 
 	/** Prepare testbot for performing actions on a DUT. */
-	public abstract async setup(): Promise<void>;
+	public abstract setup(): Promise<void>;
 
 	/** Set target Vout to power the DUT. Should be executed before powerOn(). */
-	public abstract async setVout(target: number): Promise<void>;
+	public abstract setVout(target: number): Promise<void>;
 
 	/** Get current Vout. */
-	public abstract async readVout(): Promise<number>;
+	public abstract readVout(): Promise<number>;
 
 	/** Get current amperage on Vout. */
-	public abstract async readVoutAmperage(): Promise<number>;
+	public abstract readVoutAmperage(): Promise<number>;
 
-	public abstract async powerOffDUT(): Promise<void>;
+	public abstract powerOffDUT(): Promise<void>;
 
-	public abstract async powerOnDUT(): Promise<void>;
+	public abstract powerOnDUT(): Promise<void>;
 
-	public abstract async switchSdToDUT(delay: number): Promise<void>;
+	public abstract switchSdToDUT(delay: number): Promise<void>;
 
-	public abstract async switchSdToHost(delay: number): Promise<void>;
+	public abstract switchSdToHost(delay: number): Promise<void>;
 
 	protected abstract teardownBoard(): void;
 }

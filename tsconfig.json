@@ -23,8 +23,7 @@
     "lib", "test"
   ],  
   "typedocOptions": {
-    "inputFiles": ["./lib"],
-    "mode": "modules",
-    "out": "docs"
+    "entryPoints": ["./lib"],
+    "out": "docs/"
   }
 }

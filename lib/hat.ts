@@ -67,7 +67,7 @@ export class TestBotHat extends TestBot {
 	 *  Method to setup HAT's firmata connection and ready the testbot for testing
 	 */
 	public async setup() {
-		await new Promise((resolve, reject) => {
+		await new Promise<void>((resolve, reject) => {
 			const timeout = setTimeout(() => {
 				reject(new Error('Firmata connection timed out'));
 			}, TestBotHat.SETUP_TIMEOUT_MS);
@@ -153,7 +153,7 @@ export class TestBotHat extends TestBot {
 	protected teardownBoard() {
 		// Firmata types module has a dependency on serialport 4.x, while a newer version is used.
 		// Hence, here we manually cast the transport.
-		const transport = (this.transport as unknown) as SerialPort;
+		const transport = this.transport as unknown as SerialPort;
 		if (transport.isOpen) {
 			this.log('Closing the firmata transport...');
 			transport.close();
